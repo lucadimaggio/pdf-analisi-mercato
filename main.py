@@ -22,8 +22,12 @@ async def generate_pdf(request: Request):
     template = env.get_template("report.html")
     html_content = template.render(message="Analisi di mercato generata con successo (via pdfkit)")
 
+    # Configura pdfkit per usare il binario dentro /app/bin/ (Railway)
+    config = pdfkit.configuration(wkhtmltopdf="/app/bin/wkhtmltopdf")
+
     # Converte HTML in PDF usando pdfkit
-    pdf_bytes = pdfkit.from_string(html_content, False)
+    pdf_bytes = pdfkit.from_string(html_content, False, configuration=config)
+
 
     # Restituisce il PDF come file
     return StreamingResponse(io.BytesIO(pdf_bytes), media_type="application/pdf", headers={
