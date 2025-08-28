@@ -29,11 +29,9 @@ async def generate_pdf(body: PdfRequest):
     template = env.get_template("report.html")
     html_content = template.render(message=html_message)
 
-    # Configura pdfkit per usare il binario wkhtmltopdf
-    config = pdfkit.configuration(wkhtmltopdf="/app/bin/wkhtmltopdf")
-
-    # Converte HTML in PDF
-    pdf_bytes = pdfkit.from_string(html_content, False, configuration=config)
+    # Converte HTML in PDF. Non serve la configurazione personalizzata
+    # perché il binario sarà nel PATH di sistema del container.
+    pdf_bytes = pdfkit.from_string(html_content, False)
 
     # Restituisce il PDF come file
     return StreamingResponse(io.BytesIO(pdf_bytes), media_type="application/pdf", headers={
