@@ -1,31 +1,25 @@
-# Use a slim Python 3.10 image as the base
-FROM python:3.10-slim
+# Usa un'immagine Python 3.10 basata su Debian Bullseye
+FROM python:3.10-slim-bullseye
 
-# Set the working directory inside the container
+# Imposta la directory di lavoro all'interno del container
 WORKDIR /app
 
-# Install wkhtmltopdf and other system dependencies
+# Installa wkhtmltopdf e le sue dipendenze richieste dal repository Bullseye
 RUN apt-get update && apt-get install -y \
-    wget \
+    wkhtmltopdf \
     build-essential \
-    libxrender1 \
-    libxext6 \
     libjpeg-dev \
     zlib1g-dev \
-    libssl-dev \
-    && rm -rf /var/lib/apt/lists/* \
-    && wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-2/wkhtmltopdf_0.12.6.1-2.bullseye_amd64.deb \
-    && dpkg -i wkhtmltopdf_0.12.6.1-2.bullseye_amd64.deb \
-    && rm wkhtmltopdf_0.12.6.1-2.bullseye_amd64.deb
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy the project files into the working directory
+# Copia i file del progetto nella directory di lavoro
 COPY . .
 
-# Install the Python dependencies
+# Installa le dipendenze Python
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose the port on which the application runs
+# Espone la porta su cui gira l'applicazione
 EXPOSE 8000
 
-# Command to start the application with uvicorn
+# Comando per avviare l'applicazione con uvicorn
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
