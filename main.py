@@ -8,6 +8,7 @@ from pydantic import BaseModel
 import logging
 
 # Imposta il logger per debug
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
@@ -49,18 +50,18 @@ async def generate_pdf(body: PdfRequest):
     # Logga le opzioni per il debug
     logger.info(f"Opzioni wkhtmltopdf: {options}")
     
-    # Converte HTML in PDF con le opzioni corrette
-    # Nota: la versione di wkhtmltopdf che stiamo usando nel container
-    # non supporta l'opzione --page-size con valori personalizzati.
-    # Usiamo --page-width e --page-height.
-    # Se width e height non sono specificati, si userà la dimensione A4 di default.
+    # Avvolgiamo la chiamata a pdfkit in un blocco try-except
     try:
+        # Converte HTML in PDF con le opzioni corrette.
+        # Se width e height non sono specificati, si userà la dimensione A4 di default.
         pdf_bytes = pdfkit.from_string(html_content, False, options=options)
+        
+        # Restituisce il PDF come file
+        return StreamingResponse(io.BytesIO(pdf_bytes), media_type="application/pdf", headers={
+            "Content-Disposition": "inline; filename=analisi.pdf"
+        })
+
     except Exception as e:
+        # Se c'è un errore, lo catturiamo e lo restituiamo come messaggio JSON
         logger.error(f"Errore durante la generazione del PDF: {e}")
         return {"error": f"Errore durante la generazione del PDF: {e}"}
-
-    # Restituisce il PDF come file
-    return StreamingResponse(io.BytesIO(pdf_bytes), media_type="application/pdf", headers={
-        "Content-Disposition": "inline; filename=analisi.pdf"
-    })
