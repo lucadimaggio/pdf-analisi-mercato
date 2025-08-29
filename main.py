@@ -133,8 +133,8 @@ async def generate_pdf(body: PdfRequest):
     report_title = "ANALISI PMP ALFAMIX"
     c.setFont("Montserrat-Bold", 24)
     c.setFillColor(white)
-    c.drawCentredString(margin, y_pos - 20, report_title)
-    
+    c.drawString(margin, y_pos - 20, report_title)
+
     y_pos -= 60
     
     # Dati del cliente
