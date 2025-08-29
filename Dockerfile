@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     libxrender1 \
     libfontconfig1 \
-    libjpeg-turbo8-dev \
+    libjpeg-dev \
     xfonts-base \
     && rm -rf /var/lib/apt/lists/*
 
