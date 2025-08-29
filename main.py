@@ -108,7 +108,8 @@ async def generate_pdf(body: PdfRequest):
     page_size = (1080, 607.5)
     c = canvas.Canvas(buffer, pagesize=page_size)
 
-   
+    # Posizionamento
+    page_width, page_height = page_size
 
     # Colori gradiente
     top = HexColor("#000000")      # nero
@@ -122,8 +123,6 @@ async def generate_pdf(body: PdfRequest):
     white = HexColor("#FFFFFF")
 
     
-    # Posizionamento
-    page_width, page_height = page_size
     margin = 81
     col_width = 450
     col_x_pos = margin
