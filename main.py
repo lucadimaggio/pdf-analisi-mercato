@@ -9,7 +9,7 @@ from reportlab.lib.pagesizes import landscape, A4
 from reportlab.lib.utils import simpleSplit
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.enums import TA_LEFT
-from reportlab.lib.colors import HexColor
+from reportlab.lib.colors import HexColor, Color
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
@@ -79,15 +79,49 @@ async def generate_pdf(body: PdfRequest):
         y = draw_paragraph(c, x, y, content, max_width)
         return y
     
+
+    def draw_vertical_gradient(c, width, height, top_color, mid_color, bottom_color, steps=200):
+        """
+        Disegna un gradiente verticale (90°) da top → mid → bottom.
+        """
+        for i in range(steps):
+            ratio = i / (steps - 1)
+            if ratio < 0.5:
+                local_ratio = ratio / 0.5
+                r = top_color.red + (mid_color.red - top_color.red) * local_ratio
+                g = top_color.green + (mid_color.green - top_color.green) * local_ratio
+                b = top_color.blue + (mid_color.blue - top_color.blue) * local_ratio
+            else:
+                local_ratio = (ratio - 0.5) / 0.5
+                r = mid_color.red + (bottom_color.red - mid_color.red) * local_ratio
+                g = mid_color.green + (bottom_color.green - mid_color.green) * local_ratio
+                b = mid_color.blue + (bottom_color.blue - mid_color.blue) * local_ratio
+
+            c.setFillColor(Color(r, g, b))
+            y = int(height * ratio)
+            c.rect(0, y, width, height / steps + 1, stroke=0, fill=1)
+
+
     # Dimensioni della pagina 16:9 in punti (da 1440x810 px, a 96 DPI)
     # 1440 px / 96 dpi * 72 pt/pollice = 1080 pt
     # 810 px / 96 dpi * 72 pt/pollice = 607.5 pt
     page_size = (1080, 607.5)
     c = canvas.Canvas(buffer, pagesize=page_size)
-    
+
+   
+
+    # Colori gradiente
+    top = HexColor("#000000")      # nero
+    mid = HexColor("#001373")      # blu
+    bottom = HexColor("#000000")   # nero
+
+    # Disegna sfondo gradiente
+    draw_vertical_gradient(c, page_width, page_height, top, mid, bottom)
+
     # Stili di base e colori
     gray = HexColor("#4a4a4a")
     dark_gray = HexColor("#2c2c2c")
+
     
     # Posizionamento
     page_width, page_height = page_size
