@@ -12,19 +12,18 @@
             margin: 0;
             padding: 0;
             color: #ffffff; /* Testo bianco per contrasto */
-            /* Gradiente lineare a 90 gradi con i colori specificati */
             background: linear-gradient(90deg, #000000, #001373, #000000);
             box-sizing: border-box;
             padding: 2cm;
+            font-size: 11pt; /* Font base più leggibile */
         }
 
-        /* Stili per il layout del contenuto */
         .container {
             width: 100%;
             height: 100%;
         }
 
-        h1, h2 {
+        h1, h2, h3 {
             font-weight: 700;
             text-transform: uppercase;
         }
@@ -33,13 +32,23 @@
             font-size: 2.5rem;
             text-align: center;
             margin-bottom: 2rem;
+            color: #ffffff;
         }
 
         h2 {
             font-size: 1.5rem;
+            margin-top: 2rem;
             margin-bottom: 1rem;
-            border-bottom: 2px solid #001373; /* Sottile linea blu per separare le sezioni */
+            border-bottom: 2px solid #001373;
             padding-bottom: 0.5rem;
+            color: #ffffff;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #001373;
         }
 
         .section {
@@ -49,10 +58,12 @@
         ul {
             list-style-type: none;
             padding: 0;
+            margin-bottom: 1.5rem;
         }
 
         ul li {
-            margin-bottom: 1.5rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
         }
         
         .bullet-point {
@@ -72,6 +83,21 @@
         .content-text {
             display: inline;
         }
+
+        .data-point {
+            margin-bottom: 1rem;
+        }
+
+        .data-label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 0.25rem;
+            color: #001373;
+        }
+        
+        .data-value {
+            color: #ffffff;
+        }
     </style>
 </head>
 <body>
@@ -79,30 +105,75 @@
         <h1>Analisi PMP Alfamix</h1>
         
         <div class="section">
-            <h2>Dati Raccolti</h2>
-            <ul>
-                <li><span class="title-text">Informazioni cronologiche:</span> {{ data['Informazioni cronologiche'] }}</li>
-                <li><span class="title-text">Indirizzo email:</span> {{ data['Indirizzo email'] }}</li>
-                <li><span class="title-text">Prodotto più venduto:</span> {{ data['Quale prodotto stai vendendo di più ultimamente? Inserisci i link dei prodotti'] }}</li>
-            </ul>
+            <h2>Dati Cliente</h2>
+            <div class="data-point">
+                <span class="data-label">Ragione Sociale:</span>
+                <span class="data-value">{{ data.cliente.ragione_sociale }}</span>
+            </div>
+            <div class="data-point">
+                <span class="data-label">Sito Web:</span>
+                <span class="data-value">{{ data.cliente.sito_web }}</span>
+            </div>
+            <div class="data-point">
+                <span class="data-label">Descrizione Business:</span>
+                <span class="data-value">{{ data.cliente.descrizione_business }}</span>
+            </div>
+            <div class="data-point">
+                <span class="data-label">Differenziazione:</span>
+                <span class="data-value">{{ data.cliente.differenziazione }}</span>
+            </div>
+            <div class="data-point">
+                <span class="data-label">Competitor Principali:</span>
+                <span class="data-value">{{ data.cliente.competitor_principali }}</span>
+            </div>
         </div>
 
         <div class="section">
-            <h2>Vantaggi e Apprezzamenti</h2>
-            <ul>
-                <li><span class="title-text">Vantaggi del prodotto:</span> {{ data['Quali sono i vantaggi del prodotto?\n'] }}</li>
-                <li><span class="title-text">Cosa apprezzano i clienti:</span> {{ data['Cosa apprezzano maggiormente i clienti dei tuoi prodotti?'] }}</li>
-            </ul>
+            <h2>Analisi del Target Demografico</h2>
+            <div class="data-point">
+                <span class="data-label">Età:</span>
+                <span class="data-value">{{ data.target_demografico.eta }}</span>
+            </div>
+            <div class="data-point">
+                <span class="data-label">Genere:</span>
+                <span class="data-value">{{ data.target_demografico.genere }}</span>
+            </div>
+            <div class="data-point">
+                <span class="data-label">Professione:</span>
+                <span class="data-value">{{ data.target_demografico.professione }}</span>
+            </div>
+            <div class="data-point">
+                <span class="data-label">Interessi:</span>
+                <span class="data-value">{{ data.target_demografico.interessi }}</span>
+            </div>
+            <div class="data-point">
+                <span class="data-label">Stile di Vita:</span>
+                <span class="data-value">{{ data.target_demografico.stile_vita }}</span>
+            </div>
         </div>
 
         <div class="section">
-            <h2>Strategia di Mercato</h2>
+            <h2>Benefici e Obiezioni</h2>
+            <h3>Benefici dei Prodotti</h3>
+            <p>{{ data.benefici_prodotti }}</p>
+
+            <h3>Obiezioni del Cliente</h3>
             <ul>
-                <li><span class="title-text">Target di riferimento:</span> {{ data['Qual è il tuo target di riferimento per questi prodotti?'] }}</li>
-                <li><span class="title-text">Abbinamenti per aumentare il carrello medio:</span> {{ data['Che abbinamenti faresti per aumentare il carrello medio?'] }}</li>
-                <li><span class="title-text">Migliori competitor:</span> {{ data['Quali sono i vostri maggiori competitor e su cosa puntano?'] }}</li>
-                <li><span class="title-text">Mercati potenziali:</span> {{ data['Ci sono dei mercati oltre a quello italiano che pensi possano essere profittevoli? Se sì perché?'] }}</li>
+                <li class="data-point"><span class="data-label">Necessità:</span>
+                    <span class="data-value">{{ data.obiezioni.necessita }}</span>
+                </li>
+                <li class="data-point"><span class="data-label">Possibilità:</span>
+                    <span class="data-value">{{ data.obiezioni.possibilita }}</span>
+                </li>
+                <li class="data-point"><span class="data-label">Credibilità Azienda:</span>
+                    <span class="data-value">{{ data.obiezioni.credibilita_azienda }}</span>
+                </li>
             </ul>
+        </div>
+        
+        <div class="section">
+            <h2>Bisogni di Robbins</h2>
+            <p>{{ data.bisogni_robbins }}</p>
         </div>
     </div>
 </body>
