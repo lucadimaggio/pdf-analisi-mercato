@@ -1,8 +1,9 @@
+import os
+import pdfkit
+import io
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 from jinja2 import Environment, FileSystemLoader
-import pdfkit
-import io
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -22,15 +23,13 @@ def home():
 
 @app.post("/generate-pdf")
 async def generate_pdf(body: PdfRequest):
-    # Usa il valore del body, o il default se non presente
     html_message = body.message
 
-    # Renderizza il template HTML (report.html)
     template = env.get_template("report.html")
     html_content = template.render(message=html_message)
 
     # Converte HTML in PDF. Non serve la configurazione personalizzata
-    # perché il binario sarà nel PATH di sistema del container.
+    # perché il binario sarà nel PATH di sistema (sia locale che su Railway).
     pdf_bytes = pdfkit.from_string(html_content, False)
 
     # Restituisce il PDF come file
