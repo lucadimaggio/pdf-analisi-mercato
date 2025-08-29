@@ -4,42 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analisi Mercato</title>
+    <!-- Importa il font Montserrat da Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
     <style>
         body {
-            font-family: sans-serif; /* Scegli un font di sistema pulito come Arial o Helvetica */
+            font-family: 'Montserrat', sans-serif;
             margin: 0;
             padding: 0;
             color: #ffffff; /* Testo bianco per contrasto */
-            /* Ricrea il gradiente come sfondo */
-            background: linear-gradient(to right, 
-                rgb(0%, 5.76%, 34.88%) 0%,
-                rgb(0%, 7.45%, 45.09%) 50%,
-                rgb(0%, 0%, 0%) 100%
-            );
-            /* Imposta le dimensioni in base al ViewBox 16:9, poi adattale a un formato A4 */
-            width: 21cm; /* Larghezza di un A4 */
-            height: 29.7cm; /* Altezza di un A4 */
+            /* Gradiente lineare a 90 gradi con i colori specificati */
+            background: linear-gradient(90deg, #000000, #001373, #000000);
             box-sizing: border-box;
-            padding: 2cm; /* Esempio di margine per un design pulito */
-        }
-        
-        .container {
             padding: 2cm;
         }
 
-        h1, h2, h3, h4, h5, h6 {
-            font-weight: bold;
+        /* Stili per il layout del contenuto */
+        .container {
+            width: 100%;
+            height: 100%;
+        }
+
+        h1, h2 {
+            font-weight: 700;
             text-transform: uppercase;
         }
 
         h1 {
-            font-size: 2.5rem; /* Dimensione grande per il titolo principale */
+            font-size: 2.5rem;
+            text-align: center;
             margin-bottom: 2rem;
         }
 
         h2 {
             font-size: 1.5rem;
             margin-bottom: 1rem;
+            border-bottom: 2px solid #001373; /* Sottile linea blu per separare le sezioni */
+            padding-bottom: 0.5rem;
         }
 
         .section {
@@ -47,16 +47,16 @@
         }
 
         ul {
-            list-style-type: none; /* Rimuove i puntini predefiniti dell'HTML */
+            list-style-type: none;
             padding: 0;
         }
 
         ul li {
             margin-bottom: 1.5rem;
         }
-
-        .bullet-point::before {
-            content: '•'; /* Aggiunge un punto come carattere speciale */
+        
+        .bullet-point {
+            content: '•';
             color: #ffffff;
             font-size: 1.2rem;
             display: inline-block;
@@ -65,29 +65,43 @@
         }
 
         .title-text {
-            font-weight: bold;
+            font-weight: 700;
             display: inline;
         }
 
         .content-text {
             display: inline;
         }
-
     </style>
 </head>
 <body>
-
     <div class="container">
-        <h1>ANALISI MERCATO</h1>
+        <h1>Analisi PMP Alfamix</h1>
         
         <div class="section">
-            <h2>DATI RACCOLTI</h2>
-            <h3 class="title-text">Benefici dei prodotti:</h3>
+            <h2>Dati Raccolti</h2>
             <ul>
-                <li><span class="bullet-point"></span><span class="title-text">Unicità prodotto:</span> <span class="content-text">I Brik e i fieni compressi sono una rarità sul mercato italiano, quindi il cliente ha la certezza di acquistare un prodotto che non trova facilmente altrove → meno alternative = più sicurezza nella scelta.</span></li>
-                <li><span class="bullet-point"></span><span class="title-text">Qualità materia prima:</span> <span class="content-text">Fieni selezionati e lavorazioni curate danno garanzia di salute e benessere del cavallo. I clienti, che spesso hanno un forte legame emotivo con l'animale, vivono questo come garanzia di protezione.</span></li>
-                <li><span class="bullet-point"></span><span class="title-text">Nutrizione bilanciata:</span> <span class="content-text">Mangimi come il Derby Protector o la Polpa di Barbabietola hanno formule specifiche (alta digeribilità, fibre, protezione intestinale).<br>Risultato: miglior resa del cavallo in salute e performance.</span></li>
-                <li><span class="bullet-point"></span><span class="title-text">Praticità e logistica:</span> <span class="content-text">Il Brik compresso è più facile da trasportare e stoccare rispetto al fieno sfuso → risparmio di spazio, riduzione sprechi e meno fatica fisica.</span></li>
+                <li><span class="title-text">Informazioni cronologiche:</span> {{ data['Informazioni cronologiche'] }}</li>
+                <li><span class="title-text">Indirizzo email:</span> {{ data['Indirizzo email'] }}</li>
+                <li><span class="title-text">Prodotto più venduto:</span> {{ data['Quale prodotto stai vendendo di più ultimamente? Inserisci i link dei prodotti'] }}</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Vantaggi e Apprezzamenti</h2>
+            <ul>
+                <li><span class="title-text">Vantaggi del prodotto:</span> {{ data['Quali sono i vantaggi del prodotto?\n'] }}</li>
+                <li><span class="title-text">Cosa apprezzano i clienti:</span> {{ data['Cosa apprezzano maggiormente i clienti dei tuoi prodotti?'] }}</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Strategia di Mercato</h2>
+            <ul>
+                <li><span class="title-text">Target di riferimento:</span> {{ data['Qual è il tuo target di riferimento per questi prodotti?'] }}</li>
+                <li><span class="title-text">Abbinamenti per aumentare il carrello medio:</span> {{ data['Che abbinamenti faresti per aumentare il carrello medio?'] }}</li>
+                <li><span class="title-text">Migliori competitor:</span> {{ data['Quali sono i vostri maggiori competitor e su cosa puntano?'] }}</li>
+                <li><span class="title-text">Mercati potenziali:</span> {{ data['Ci sono dei mercati oltre a quello italiano che pensi possano essere profittevoli? Se sì perché?'] }}</li>
             </ul>
         </div>
     </div>

@@ -2,37 +2,61 @@ import os
 import pdfkit
 import io
 from fastapi import FastAPI
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, Response
 from jinja2 import Environment, FileSystemLoader
 from pydantic import BaseModel
+from typing import Dict, Any
 
 app = FastAPI()
 
 # Configurazione Jinja2
 env = Environment(loader=FileSystemLoader("templates"))
 
-# Definiamo il modello di input
+# Modello di input aggiornato per accettare un JSON completo
 class PdfRequest(BaseModel):
-    message: str | None = "Analisi di mercato generata con successo (via pdfkit)"
-
+    data: Dict[str, Any]
 
 @app.get("/")
 def home():
+    """Endpoint per verificare se il servizio è attivo."""
     return {"message": "PDF Service is running 🚀"}
-
 
 @app.post("/generate-pdf")
 async def generate_pdf(body: PdfRequest):
-    html_message = body.message
+    """
+    Endpoint che riceve dati JSON, li usa per renderizzare un template HTML
+    e restituisce un file PDF.
+    """
+    try:
+        # Carica il template HTML
+        template = env.get_template("report.html")
 
-    template = env.get_template("report.html")
-    html_content = template.render(message=html_message)
+        # Passa i dati dal corpo della richiesta al template
+        # Il modello dei dati è 'data', quindi accediamo con body.data
+        html_content = template.render(data=body.data)
 
-    # Converte HTML in PDF. Non serve la configurazione personalizzata
-    # perché il binario sarà nel PATH di sistema (sia locale che su Railway).
-    pdf_bytes = pdfkit.from_string(html_content, False)
+        # Definisci le opzioni di configurazione per il PDF
+        # Dimensioni personalizzate e orientamento orizzontale
+        options = {
+            'orientation': 'Landscape',
+            'page-width': '1440px',
+            'page-height': '810px',
+            'margin-top': '0mm',
+            'margin-right': '0mm',
+            'margin-bottom': '0mm',
+            'margin-left': '0mm'
+        }
 
-    # Restituisce il PDF come file
-    return StreamingResponse(io.BytesIO(pdf_bytes), media_type="application/pdf", headers={
-        "Content-Disposition": "inline; filename=analisi.pdf"
-    })
+        # Converte l'HTML in PDF usando pdfkit con le opzioni
+        pdf_bytes = pdfkit.from_string(html_content, False, options=options)
+
+        # Restituisce il PDF come file
+        return StreamingResponse(io.BytesIO(pdf_bytes), media_type="application/pdf", headers={
+            "Content-Disposition": "inline; filename=analisi.pdf"
+        })
+    except Exception as e:
+        return Response(content=f"Errore durante la generazione del PDF: {str(e)}", status_code=500, media_type="text/plain")
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
