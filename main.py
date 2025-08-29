@@ -53,8 +53,10 @@ async def generate_pdf(body: PdfRequest):
         
         current_y = y
         for line in text_lines:
+            current_y = check_and_new_page(c, current_y)
             c.drawString(value_x_start, current_y, line)
             current_y -= 15
+
         
         return current_y
 
@@ -65,8 +67,10 @@ async def generate_pdf(body: PdfRequest):
         
         current_y = y
         for line in text_lines:
+            current_y = check_and_new_page(c, current_y)
             c.drawString(x, current_y, line)
             current_y -= leading
+
         
         return current_y
 
@@ -102,6 +106,8 @@ async def generate_pdf(body: PdfRequest):
             c.rect(0, y, width, height / steps + 1, stroke=0, fill=1)
 
 
+
+
     # Dimensioni della pagina 16:9 in punti (da 1440x810 px, a 96 DPI)
     # 1440 px / 96 dpi * 72 pt/pollice = 1080 pt
     # 810 px / 96 dpi * 72 pt/pollice = 607.5 pt
@@ -124,10 +130,19 @@ async def generate_pdf(body: PdfRequest):
 
     
     margin = 81
+    bottom_margin = 60
     col_width = 450
     col_x_pos = margin
     content_x_pos = col_x_pos + col_width + margin
     y_pos = page_height - margin
+
+    def check_and_new_page(c, current_y):
+        if current_y < bottom_margin:
+            c.showPage()
+            draw_vertical_gradient(c, page_width, page_height, top, mid, bottom)
+            c.setFillColor(white)
+            return page_height - margin
+        return current_y
 
     # Titolo del report
     report_title = "ANALISI PMP ALFAMIX"
