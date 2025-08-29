@@ -16,11 +16,12 @@ app = FastAPI()
 # Configurazione Jinja2
 env = Environment(loader=FileSystemLoader("templates"))
 
-# Definiamo il modello di input che ora accetta i dati del report
+# Definiamo il modello di input che ora accetta i dati del report e l'orientamento
 class PdfRequest(BaseModel):
     data: dict | None = None
     width: str | None = None
     height: str | None = None
+    orientation: str | None = None # Aggiungiamo il parametro di orientamento
 
 @app.get("/")
 def home():
@@ -41,6 +42,10 @@ async def generate_pdf(body: PdfRequest):
         'encoding': 'UTF-8'
     }
 
+    # Aggiungi l'orientamento, se specificato
+    if body.orientation:
+        options['orientation'] = body.orientation
+    # Se width e height sono specificati, li aggiungi alle opzioni
     if body.width:
         options['page-width'] = body.width
     if body.height:
@@ -49,7 +54,7 @@ async def generate_pdf(body: PdfRequest):
     logger.info(f"Opzioni wkhtmltopdf: {options}")
     
     try:
-        # Converte HTML in PDF.
+        # Converte HTML in PDF con le opzioni corrette.
         pdf_bytes = pdfkit.from_string(html_content, False, options=options)
         
         return StreamingResponse(io.BytesIO(pdf_bytes), media_type="application/pdf", headers={
