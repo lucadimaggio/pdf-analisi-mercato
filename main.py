@@ -10,6 +10,13 @@ from reportlab.lib.utils import simpleSplit
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.colors import HexColor
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
+# Registra i font Montserrat
+pdfmetrics.registerFont(TTFont("Montserrat", "fonts/Montserrat-Regular.ttf"))
+pdfmetrics.registerFont(TTFont("Montserrat-Bold", "fonts/Montserrat-Bold.ttf"))
+
 
 # Imposta il logger
 logging.basicConfig(level=logging.INFO)
@@ -33,16 +40,16 @@ async def generate_pdf(body: PdfRequest):
     
     # Funzione per disegnare chiavi e valori con wrapping del testo
     def draw_key_value(c, x, y, key, value, max_width):
-        c.setFont("Helvetica-Bold", 12)
+        c.setFont("Montserrat-Bold", 12)
         c.drawString(x, y, key)
-        c.setFont("Helvetica", 12)
+        c.setFont("Montserrat-Regular", 12)
         
         # Calcola la larghezza disponibile per il testo del valore
-        value_x_start = x + c.stringWidth(key, "Helvetica-Bold", 12) + 5
+        value_x_start = x + c.stringWidth(key, "Montserrat-Bold", 12) + 5
         value_width = max_width - (value_x_start - x)
         
         # Suddividi il testo in righe che si adattano alla larghezza
-        text_lines = simpleSplit(value, "Helvetica", 12, value_width)
+        text_lines = simpleSplit(value, "Montserrat-Regular", 12, value_width)
         
         current_y = y
         for line in text_lines:
@@ -53,8 +60,8 @@ async def generate_pdf(body: PdfRequest):
 
     # Funzione per disegnare un paragrafo con wrapping del testo
     def draw_paragraph(c, x, y, text, max_width, font_size=12, leading=14):
-        c.setFont("Helvetica", font_size)
-        text_lines = simpleSplit(text, "Helvetica", font_size, max_width)
+        c.setFont("Montserrat-Regular", font_size)
+        text_lines = simpleSplit(text, "Montserrat-Regular", font_size, max_width)
         
         current_y = y
         for line in text_lines:
@@ -65,7 +72,7 @@ async def generate_pdf(body: PdfRequest):
 
     # Funzione per disegnare una sezione con titolo e contenuto
     def draw_section(c, x, y, title, content, max_width):
-        c.setFont("Helvetica-Bold", 14)
+        c.setFont("Montserrat-Bold", 14)
         c.setFillColor(HexColor("#4a4a4a"))
         c.drawString(x, y, title)
         y -= 20
@@ -92,14 +99,14 @@ async def generate_pdf(body: PdfRequest):
 
     # Titolo del report
     report_title = "ANALISI PMP ALFAMIX"
-    c.setFont("Helvetica-Bold", 24)
+    c.setFont("Montserrat-Bold", 24)
     c.setFillColor(dark_gray)
     c.drawCentredString(page_width / 2, y_pos - 20, report_title)
     
     y_pos -= 60
     
     # Dati del cliente
-    c.setFont("Helvetica-Bold", 14)
+    c.setFont("Montserrat-Bold", 14)
     c.setFillColor(gray)
     c.drawString(col_x_pos, y_pos, "DATI CLIENTE")
     y_pos -= 20
@@ -115,7 +122,7 @@ async def generate_pdf(body: PdfRequest):
     
     # --- Nuova sezione per Target Demografico ---
     y_pos -= 30
-    c.setFont("Helvetica-Bold", 14)
+    c.setFont("Montserrat-Bold", 14)
     c.drawString(col_x_pos, y_pos, "TARGET DEMOGRAFICO")
     y_pos -= 20
     
@@ -128,7 +135,7 @@ async def generate_pdf(body: PdfRequest):
     
     # --- Nuove sezioni per Benefici e Obiezioni ---
     y_pos -= 30
-    c.setFont("Helvetica-Bold", 14)
+    c.setFont("Montserrat-Bold", 14)
     c.drawString(col_x_pos, y_pos, "BENEFICI E OBIEZIONI")
     y_pos -= 20
     
@@ -138,7 +145,7 @@ async def generate_pdf(body: PdfRequest):
     
     # --- Nuova sezione per Bisogni di Robbins ---
     y_pos -= 30
-    c.setFont("Helvetica-Bold", 14)
+    c.setFont("Montserrat-Bold", 14)
     c.drawString(col_x_pos, y_pos, "BISOGNI DI ROBBINS")
     y_pos -= 20
     y_pos = draw_paragraph(c, col_x_pos, y_pos, body.data.get("bisogni_robbins", ""), col_width)
