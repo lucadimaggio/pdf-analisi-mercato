@@ -119,13 +119,12 @@ async def generate_pdf(body: PdfRequest):
     draw_vertical_gradient(c, page_width, page_height, top, mid, bottom)
 
     # Stili di base e colori
-    gray = HexColor("#4a4a4a")
-    dark_gray = HexColor("#2c2c2c")
+    white = HexColor("#FFFFFF")
 
     
     # Posizionamento
     page_width, page_height = page_size
-    margin = 50
+    margin = 81
     col_width = 450
     col_x_pos = margin
     content_x_pos = col_x_pos + col_width + margin
@@ -134,14 +133,14 @@ async def generate_pdf(body: PdfRequest):
     # Titolo del report
     report_title = "ANALISI PMP ALFAMIX"
     c.setFont("Montserrat-Bold", 24)
-    c.setFillColor(dark_gray)
-    c.drawCentredString(page_width / 2, y_pos - 20, report_title)
+    c.setFillColor(white)
+    c.drawCentredString(margin, y_pos - 20, report_title)
     
     y_pos -= 60
     
     # Dati del cliente
     c.setFont("Montserrat-Bold", 14)
-    c.setFillColor(gray)
+    c.setFillColor(white)
     c.drawString(col_x_pos, y_pos, "DATI CLIENTE")
     y_pos -= 20
     
