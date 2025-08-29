@@ -79,10 +79,27 @@ async def generate_pdf(body: PdfRequest):
         c.setFont("Montserrat-Bold", 14)
         c.setFillColor(HexColor("#4a4a4a"))
         c.drawString(x, y, title)
-        y -= 20
-        y = draw_paragraph(c, x, y, content, max_width)
-        return y
+        
     
+    def draw_page_layout(c, title, subtitle, paragraph):
+        # Titolo principale
+        c.setFont("Montserrat-Bold", 36)  # grandezza proporzionata
+        c.setFillColor(white)
+        c.drawString(81, page_height - 81, title.upper())
+
+        # Sottotitolo
+        c.setFont("Montserrat-Regular", 24)
+        c.drawString(81, page_height - 176, subtitle.upper())
+
+        # Paragrafo
+        c.setFont("Montserrat-Regular", 22)
+        text_lines = simpleSplit(paragraph, "Montserrat-Regular", 22, 1278)
+        current_y = page_height - 240
+        for line in text_lines:
+            current_y = check_and_new_page(c, current_y)
+            c.drawString(81, current_y, line)
+            current_y -= 26
+
 
     def draw_vertical_gradient(c, width, height, top_color, mid_color, bottom_color, steps=200):
         """
@@ -144,14 +161,19 @@ async def generate_pdf(body: PdfRequest):
             return page_height - margin
         return current_y
 
-    # Titolo del report
-    report_title = "ANALISI PMP ALFAMIX"
-    c.setFont("Montserrat-Bold", 24)
-    c.setFillColor(white)
-    c.drawString(margin, y_pos - 20, report_title)
+     # Titolo + sottotitolo + paragrafo
+    benefici_raw = body.data.get("benefici_prodotti", "")
+    benefici_list = benefici_raw.split("|") if benefici_raw else []
+    benefici_text = "Benefici dei prodotti:\n" + "\n".join([f"- {b.strip()}" for b in benefici_list])
 
-    y_pos -= 60
-    
+    draw_page_layout(
+        c,
+        "ANALISI DI MERCATO",  # Titolo
+        "DATI RACCOLTI", # Sottotitolo (puoi prenderlo dal body.data)
+        benefici_text # Paragrafo di esempio
+    )
+
+
     # Dati del cliente
     c.setFont("Montserrat-Bold", 14)
     c.setFillColor(white)
