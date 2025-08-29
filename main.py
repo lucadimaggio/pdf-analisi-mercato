@@ -1,6 +1,6 @@
 import os
 import io
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 import logging
@@ -8,9 +8,8 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import landscape, A4
 from reportlab.lib.utils import simpleSplit
 from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import Paragraph
-from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
-from reportlab.lib.colors import black, HexColor
+from reportlab.lib.enums import TA_LEFT
+from reportlab.lib.colors import HexColor
 
 # Imposta il logger
 logging.basicConfig(level=logging.INFO)
@@ -20,7 +19,7 @@ app = FastAPI()
 
 # Definiamo il modello di input
 class PdfRequest(BaseModel):
-    data: dict | None = None
+    data: dict
 
 @app.get("/")
 def home():
@@ -32,31 +31,61 @@ async def generate_pdf(body: PdfRequest):
 
     buffer = io.BytesIO()
     
+    # Funzione per disegnare chiavi e valori con wrapping del testo
+    def draw_key_value(c, x, y, key, value, max_width):
+        c.setFont("Helvetica-Bold", 12)
+        c.drawString(x, y, key)
+        c.setFont("Helvetica", 12)
+        
+        # Calcola la larghezza disponibile per il testo del valore
+        value_x_start = x + c.stringWidth(key, "Helvetica-Bold", 12) + 5
+        value_width = max_width - (value_x_start - x)
+        
+        # Suddividi il testo in righe che si adattano alla larghezza
+        text_lines = simpleSplit(value, "Helvetica", 12, value_width)
+        
+        current_y = y
+        for line in text_lines:
+            c.drawString(value_x_start, current_y, line)
+            current_y -= 15
+        
+        return current_y
+
+    # Funzione per disegnare un paragrafo con wrapping del testo
+    def draw_paragraph(c, x, y, text, max_width, font_size=12, leading=14):
+        c.setFont("Helvetica", font_size)
+        text_lines = simpleSplit(text, "Helvetica", font_size, max_width)
+        
+        current_y = y
+        for line in text_lines:
+            c.drawString(x, current_y, line)
+            current_y -= leading
+        
+        return current_y
+
+    # Funzione per disegnare una sezione con titolo e contenuto
+    def draw_section(c, x, y, title, content, max_width):
+        c.setFont("Helvetica-Bold", 14)
+        c.setFillColor(HexColor("#4a4a4a"))
+        c.drawString(x, y, title)
+        y -= 20
+        y = draw_paragraph(c, x, y, content, max_width)
+        return y
+    
     # Dimensioni della pagina 16:9 in punti (da 1440x810 px, a 96 DPI)
     # 1440 px / 96 dpi * 72 pt/pollice = 1080 pt
     # 810 px / 96 dpi * 72 pt/pollice = 607.5 pt
     page_size = (1080, 607.5)
     c = canvas.Canvas(buffer, pagesize=page_size)
     
-    # Stili di base
-    styles = getSampleStyleSheet()
-    normal_style = styles['Normal']
-    heading_style = styles['Heading1']
-    heading_style.alignment = TA_CENTER
-    normal_style.alignment = TA_LEFT
-    normal_style.fontSize = 12
-    normal_style.leading = 14  # Spaziatura tra le righe
-    
-    # Colori
+    # Stili di base e colori
     gray = HexColor("#4a4a4a")
     dark_gray = HexColor("#2c2c2c")
-
+    
     # Posizionamento
     page_width, page_height = page_size
     margin = 50
-    
-    # --- Colonna laterale per le informazioni chiave ---
-    col_width = 300
+    col_width = 450
     col_x_pos = margin
     content_x_pos = col_x_pos + col_width + margin
     y_pos = page_height - margin
@@ -69,64 +98,51 @@ async def generate_pdf(body: PdfRequest):
     
     y_pos -= 60
     
-    # Dati del cliente nella colonna laterale
+    # Dati del cliente
     c.setFont("Helvetica-Bold", 14)
     c.setFillColor(gray)
     c.drawString(col_x_pos, y_pos, "DATI CLIENTE")
     y_pos -= 20
     
-    c.setFont("Helvetica", 12)
-    y_pos = draw_key_value(c, col_x_pos, y_pos, "Ragione Sociale:", body.data.get("cliente", {}).get("ragione_sociale", ""), col_width)
-    y_pos = draw_key_value(c, col_x_pos, y_pos, "Sito Web:", body.data.get("cliente", {}).get("sito_web", ""), col_width)
+    y_pos = draw_key_value(c, col_x_pos, y_pos, "Ragione Sociale:", body.data.get("ragione_sociale", ""), col_width)
+    y_pos -= 10
+    y_pos = draw_key_value(c, col_x_pos, y_pos, "Sito Web:", body.data.get("sito_web", ""), col_width)
+    y_pos -= 10
+    y_pos = draw_key_value(c, col_x_pos, y_pos, "Descrizione Business:", body.data.get("descrizione_business", ""), col_width)
+    y_pos -= 10
+    y_pos = draw_key_value(c, col_x_pos, y_pos, "Differenziazione:", body.data.get("differenziazione", ""), col_width)
+    y_pos -= 10
     
-    c.line(col_x_pos, y_pos - 10, col_x_pos + col_width, y_pos - 10)
+    # --- Nuova sezione per Target Demografico ---
     y_pos -= 30
-    
-    # Altre sezioni nella colonna laterale
     c.setFont("Helvetica-Bold", 14)
     c.drawString(col_x_pos, y_pos, "TARGET DEMOGRAFICO")
     y_pos -= 20
-    y_pos = draw_key_value(c, col_x_pos, y_pos, "Età:", body.data.get("target_demografico", {}).get("eta", ""), col_width)
-    y_pos = draw_key_value(c, col_x_pos, y_pos, "Genere:", body.data.get("target_demografico", {}).get("genere", ""), col_width)
     
-    # --- Contenuti principali a destra ---
+    target_data = body.data.get("target_demografico", {})
+    y_pos = draw_key_value(c, col_x_pos, y_pos, "Età:", target_data.get("eta", ""), col_width)
+    y_pos -= 10
+    y_pos = draw_key_value(c, col_x_pos, y_pos, "Genere:", target_data.get("genere", ""), col_width)
+    y_pos -= 10
+    y_pos = draw_key_value(c, col_x_pos, y_pos, "Professione:", target_data.get("professione", ""), col_width)
     
-    content_y_pos = page_height - margin - 60
-    
+    # --- Nuove sezioni per Benefici e Obiezioni ---
+    y_pos -= 30
     c.setFont("Helvetica-Bold", 14)
-    c.drawString(content_x_pos, content_y_pos, "DESCRIZIONE BUSINESS")
-    content_y_pos -= 20
+    c.drawString(col_x_pos, y_pos, "BENEFICI E OBIEZIONI")
+    y_pos -= 20
     
-    business_desc = body.data.get("cliente", {}).get("descrizione_business", "")
-    content_y_pos = draw_paragraph(c, content_x_pos, content_y_pos, business_desc, page_width - content_x_pos - margin)
+    y_pos = draw_key_value(c, col_x_pos, y_pos, "Benefici:", body.data.get("benefici_prodotti", ""), col_width)
+    y_pos -= 10
+    y_pos = draw_key_value(c, col_x_pos, y_pos, "Obiezioni:", body.data.get("obiezioni", {}).get("necessita", ""), col_width)
     
-    # Funzione per disegnare chiavi e valori
-    def draw_key_value(canvas, x, y, key, value, max_width):
-        canvas.setFont("Helvetica-Bold", 12)
-        canvas.drawString(x, y, key)
-        canvas.setFont("Helvetica", 12)
-        
-        y -= 15
-        
-        # Gestione del wrapping del testo
-        text_lines = simpleSplit(value, "Helvetica", 12, max_width - canvas.stringWidth(key, "Helvetica-Bold", 12) - 10)
-        for line in text_lines:
-            canvas.drawString(x + canvas.stringWidth(key, "Helvetica-Bold", 12) + 5, y, line)
-            y -= 15
-        return y
+    # --- Nuova sezione per Bisogni di Robbins ---
+    y_pos -= 30
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(col_x_pos, y_pos, "BISOGNI DI ROBBINS")
+    y_pos -= 20
+    y_pos = draw_paragraph(c, col_x_pos, y_pos, body.data.get("bisogni_robbins", ""), col_width)
 
-    # Funzione per disegnare un paragrafo
-    def draw_paragraph(canvas, x, y, text, max_width):
-        style = styles['Normal']
-        style.alignment = TA_LEFT
-        p = Paragraph(text, style)
-        w, h = p.wrapOn(canvas, max_width, page_height)
-        p.drawOn(canvas, x, y - h)
-        return y - h - 15
-
-    # Altri dati...
-    # Puoi aggiungere altre sezioni del report in modo simile
-    
     c.save()
 
     buffer.seek(0)
