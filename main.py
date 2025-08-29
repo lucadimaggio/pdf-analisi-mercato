@@ -16,11 +16,9 @@ app = FastAPI()
 # Configurazione Jinja2
 env = Environment(loader=FileSystemLoader("templates"))
 
-# Definiamo il modello di input
+# Definiamo il modello di input che ora accetta i dati del report
 class PdfRequest(BaseModel):
-    # Il messaggio è ora opzionale
-    message: str | None = None
-    # Aggiungiamo i parametri per la larghezza e l'altezza
+    data: dict | None = None
     width: str | None = None
     height: str | None = None
 
@@ -30,38 +28,34 @@ def home():
 
 @app.post("/generate-pdf")
 async def generate_pdf(body: PdfRequest):
-    html_message = body.message or "Analisi di mercato generata con successo (via pdfkit)"
+    # Logga i dati ricevuti per il debug
+    logger.info(f"Dati ricevuti per la generazione del PDF: {body.data}")
 
     template = env.get_template("report.html")
-    html_content = template.render(message=html_message)
+    
+    # Passa l'intero dizionario 'data' al template
+    html_content = template.render(data=body.data)
 
-    # Creiamo un dizionario di opzioni per wkhtmltopdf
     options = {
         'enable-local-file-access': True,
         'encoding': 'UTF-8'
     }
 
-    # Aggiungiamo larghezza e altezza solo se sono presenti nella richiesta
     if body.width:
         options['page-width'] = body.width
     if body.height:
         options['page-height'] = body.height
 
-    # Logga le opzioni per il debug
     logger.info(f"Opzioni wkhtmltopdf: {options}")
     
-    # Avvolgiamo la chiamata a pdfkit in un blocco try-except
     try:
-        # Converte HTML in PDF con le opzioni corrette.
-        # Se width e height non sono specificati, si userà la dimensione A4 di default.
+        # Converte HTML in PDF.
         pdf_bytes = pdfkit.from_string(html_content, False, options=options)
         
-        # Restituisce il PDF come file
         return StreamingResponse(io.BytesIO(pdf_bytes), media_type="application/pdf", headers={
             "Content-Disposition": "inline; filename=analisi.pdf"
         })
 
     except Exception as e:
-        # Se c'è un errore, lo catturiamo e lo restituiamo come messaggio JSON
         logger.error(f"Errore durante la generazione del PDF: {e}")
         return {"error": f"Errore durante la generazione del PDF: {e}"}
