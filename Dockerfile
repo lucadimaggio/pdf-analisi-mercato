@@ -4,22 +4,16 @@ FROM python:3.10-slim-bullseye
 # Imposta la directory di lavoro all'interno del container
 WORKDIR /app
 
-# Installa le dipendenze essenziali per wkhtmltopdf
+# Installa wkhtmltopdf e le sue dipendenze richieste dal repository Bullseye
 RUN apt-get update && apt-get install -y \
-    wget \
+    wkhtmltopdf \
     build-essential \
+    libjpeg-dev \
+    zlib1g-dev \
     libxrender1 \
     libfontconfig1 \
-    libjpeg-dev \
     xfonts-base \
     && rm -rf /var/lib/apt/lists/*
-
-# Scarica e installa la versione statica e patchata di wkhtmltopdf
-# che supporta l'esecuzione in ambienti headless e formati personalizzati
-RUN wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.6/wkhtmltox_0.12.6-1.bullseye_amd64.deb -O /tmp/wkhtmltox.deb \
-    && dpkg -i /tmp/wkhtmltox.deb \
-    && rm /tmp/wkhtmltox.deb \
-    && cp /usr/local/bin/wkhtmltopdf /usr/bin/wkhtmltopdf
 
 # Copia i file del progetto nella directory di lavoro
 COPY . .
