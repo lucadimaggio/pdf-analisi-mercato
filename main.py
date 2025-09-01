@@ -294,7 +294,44 @@ async def generate_pdf(body: PdfRequest):
     # Crea nuova pagina con titolo POSSIBILI DIFFICOLTÀ e obiezioni
     draw_section_page(c, "Obiezioni:", obiezioni_labels, obiezioni_values)
 
-        # Recupera i bisogni derivati
+    # Recupera le domande tecniche
+    domande_raw = body.data.get("domande_tecniche", "")
+    domande_list = domande_raw.split("|") if domande_raw else []
+
+    # Crea nuova pagina con titolo e domande tecniche
+    draw_section_page(c, "Domande tecniche:", domande_list, [])
+
+    # Recupera il sito web
+    sito_web = body.data.get("sito_web", "il nostro sito")
+
+    # Crea nuova pagina con titolo e competitor
+    c.showPage()
+    draw_vertical_gradient(c, page_width, page_height, top, mid, bottom)
+    c.setFillColor(white)
+
+    # Header della pagina
+    c.setFont("Montserrat-Bold", 60)
+    c.drawString(81, page_height - 81, "ANALISI DI MERCATO")
+
+    c.setFont("Montserrat-Regular", 19.5)
+    c.drawString(81, page_height - 176, "POSSIBILI DIFFICOLTÀ")
+
+    # Paragrafo Competitor diretti
+    y_pos = page_height - 260
+    c.setFont("Montserrat-Bold", 18)
+    c.drawString(81, y_pos, "Competitor diretti:")
+    c.setFont("Montserrat-Regular", 18)
+    c.drawString(300, y_pos, f"Questi brand vendono articoli simili a quelli offerti da {sito_web} e operano nel nostro stesso mercato.")
+
+    # Paragrafo Competitor indiretti
+    y_pos -= 60
+    c.setFont("Montserrat-Bold", 18)
+    c.drawString(81, y_pos, "Competitor indiretti:")
+    c.setFont("Montserrat-Regular", 18)
+    c.drawString(300, y_pos, f"Questi sono brand che soddisfano bisogni simili a quelli di {sito_web}, ma operano in mercati differenti.")
+
+
+    # Recupera i bisogni derivati
     bisogni_derivati_raw = body.data.get("bisogni_derivati", "")
     bisogni_derivati_list = bisogni_derivati_raw.split("|") if bisogni_derivati_raw else []
 
@@ -303,6 +340,8 @@ async def generate_pdf(body: PdfRequest):
 
     # Crea nuova pagina con titolo e bisogni derivati
     draw_section_page(c, "Bisogni Derivati:", bisogni_derivati_list, spieg_bisogni_derivati_list)
+
+    
 
 
     c.save()
