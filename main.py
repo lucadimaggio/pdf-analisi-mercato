@@ -187,12 +187,24 @@ async def generate_pdf(body: PdfRequest):
     # Punto di partenza sotto il paragrafo fisso
     y_pos = page_height - 300
 
-    # Stampa i benefici dinamici uno per uno
-    for beneficio in benefici_list:
+    # Stampa i benefici dinamici con relative spiegazioni
+    spiegazione_raw = body.data.get("spiegazione_benefici_prodotti", "")
+    spiegazione_list = spiegazione_raw.split("|") if spiegazione_raw else []
+
+    for idx, beneficio in enumerate(benefici_list):
         y_pos = check_and_new_page(c, y_pos)
         c.setFont("Montserrat-Regular", 18)
         c.drawString(100, y_pos, f"- {beneficio.strip()}")
-        y_pos -= 26
+        y_pos -= 22
+
+        # Se esiste una spiegazione corrispondente, stampala rientrata e più piccola
+        if idx < len(spiegazione_list):
+            spiegazione = spiegazione_list[idx].strip()
+            if spiegazione:
+                y_pos = check_and_new_page(c, y_pos)
+                c.setFont("Montserrat-Regular", 14)
+                c.drawString(120, y_pos, f"  → {spiegazione}")
+                y_pos -= 20
 
     y_pos -= 40  # spazio extra prima della sezione successiva
 
