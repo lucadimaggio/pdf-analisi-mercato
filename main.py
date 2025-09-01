@@ -79,7 +79,21 @@ async def generate_pdf(body: PdfRequest):
         c.setFont("Montserrat-Bold", 14)
         c.setFillColor(HexColor("#4a4a4a"))
         c.drawString(x, y, title)
-        
+
+    def draw_page_header(c):
+        # Titolo principale
+        c.setFont("Montserrat-Bold", 60)
+        c.setFillColor(white)
+        c.drawString(81, page_height - 81, "ANALISI DI MERCATO")
+
+        # Sottotitolo
+        c.setFont("Montserrat-Regular", 19.5)
+        c.drawString(81, page_height - 176, "DATI RACCOLTI")
+
+        # Paragrafo fisso
+        c.setFont("Montserrat-Regular", 22)
+        c.drawString(81, page_height - 240, "Benefici dei prodotti:")
+
     
     def draw_page_layout(c, title, subtitle, paragraph):
         # Titolo principale
@@ -159,22 +173,27 @@ async def generate_pdf(body: PdfRequest):
             c.showPage()
             draw_vertical_gradient(c, page_width, page_height, top, mid, bottom)
             c.setFillColor(white)
-            return page_height - margin
+            draw_page_header(c)  # aggiunge titolo fisso e paragrafo
+            return page_height - 300  # riparte sotto il paragrafo fisso
         return current_y
 
-     # Titolo + sottotitolo + paragrafo
+     # Titolo + sottotitolo + paragrafo fisso
     benefici_raw = body.data.get("benefici_prodotti", "")
     benefici_list = benefici_raw.split("|") if benefici_raw else []
-    benefici_text = "Benefici dei prodotti:\n" + "\n".join([f"- {b.strip()}" for b in benefici_list])
 
- 
+    # Disegna header fisso sulla prima pagina
+    draw_page_header(c)
 
-    y_pos = draw_page_layout(
-        c,
-        "ANALISI DI MERCATO",  # Titolo
-        "DATI RACCOLTI", # Sottotitolo (puoi prenderlo dal body.data)
-        benefici_text # Paragrafo di esempio
-    )
+    # Punto di partenza sotto il paragrafo fisso
+    y_pos = page_height - 300
+
+    # Stampa i benefici dinamici uno per uno
+    for beneficio in benefici_list:
+        y_pos = check_and_new_page(c, y_pos)
+        c.setFont("Montserrat-Regular", 18)
+        c.drawString(100, y_pos, f"- {beneficio.strip()}")
+        y_pos -= 26
+
     y_pos -= 40  # spazio extra prima della sezione successiva
 
 
