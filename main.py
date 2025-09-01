@@ -100,7 +100,8 @@ async def generate_pdf(body: PdfRequest):
             c.drawString(81, current_y, line)
             current_y -= 26
 
-
+        return current_y
+    
     def draw_vertical_gradient(c, width, height, top_color, mid_color, bottom_color, steps=200):
         """
         Disegna un gradiente verticale (90°) da top → mid → bottom.
@@ -166,12 +167,15 @@ async def generate_pdf(body: PdfRequest):
     benefici_list = benefici_raw.split("|") if benefici_raw else []
     benefici_text = "Benefici dei prodotti:\n" + "\n".join([f"- {b.strip()}" for b in benefici_list])
 
-    draw_page_layout(
+ 
+
+    y_pos = draw_page_layout(
         c,
         "ANALISI DI MERCATO",  # Titolo
         "DATI RACCOLTI", # Sottotitolo (puoi prenderlo dal body.data)
         benefici_text # Paragrafo di esempio
     )
+    y_pos -= 40  # spazio extra prima della sezione successiva
 
 
     # Dati del cliente
