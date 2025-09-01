@@ -256,6 +256,29 @@ async def generate_pdf(body: PdfRequest):
 
     y_pos -= 40  # spazio extra prima della sezione successiva
 
+    # Recupera i dati dei bisogni di Robbins
+    bisogni_raw = body.data.get("bisogni_robbins", "")
+    bisogni_list = bisogni_raw.split("|") if bisogni_raw else []
+
+    spieg_bisogni_raw = body.data.get("spiegazione_bisogni_robbins", "")
+    spieg_bisogni_list = spieg_bisogni_raw.split("|") if spieg_bisogni_raw else []
+
+    # Crea nuova pagina con titolo e bisogni
+    draw_section_page(c, "Bisogni Primari (secondo la Teoria di Robbins):", bisogni_list, spieg_bisogni_list)
+        
+    # Recupera i dati demografici
+    target = body.data.get("target_demografico", {})
+    demographics_labels = ["Età", "Genere", "Professione", "Interessi", "Stile di vita"]
+    demographics_values = [
+        target.get("eta", ""),
+        target.get("genere", ""),
+        target.get("professione", ""),
+        target.get("interessi", ""),
+        target.get("stile_vita", ""),
+    ]
+
+    # Crea nuova pagina con titolo e dati demografici
+    draw_section_page(c, "Dati demografici:", demographics_labels, demographics_values)
 
 
     c.save()
