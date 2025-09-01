@@ -13,6 +13,7 @@ from reportlab.lib.colors import HexColor, Color
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
+
 # Registra i font Montserrat
 pdfmetrics.registerFont(TTFont("Montserrat-Regular", "fonts/Montserrat-Regular.ttf"))
 pdfmetrics.registerFont(TTFont("Montserrat-Bold", "fonts/Montserrat-Bold.ttf"))
@@ -341,10 +342,40 @@ async def generate_pdf(body: PdfRequest):
     # Crea nuova pagina con titolo e bisogni derivati
     draw_section_page(c, "Bisogni Derivati:", bisogni_derivati_list, spieg_bisogni_derivati_list)
 
+    # Salva ogni blocco in un buffer separato
+    benefici_buffer = io.BytesIO()
+    bis_bisogni_buffer = io.BytesIO()
+    demografici_buffer = io.BytesIO()
+    obiezioni_buffer = io.BytesIO()
+    domande_buffer = io.BytesIO()
+    competitor_buffer = io.BytesIO()
+    derivati_buffer = io.BytesIO()
+
+    # Chiudi e copia il PDF intero in un buffer principale
+    c.save()
+    buffer.seek(0)
+
+    # Carica PDF intero e splitta manualmente i blocchi
+    custom_reader = PdfReader(buffer)
+
+    # Assegna i blocchi a buffer separati
+    def save_block(pages, out_buffer):
+        writer = PdfWriter()
+        for page in pages:
+            writer.add_page(page)
+        writer.write(out_buffer)
+        out_buffer.seek(0)
+
+    save_block(custom_reader.pages[0:1], benefici_buffer)          # benefici
+    save_block(custom_reader.pages[1:2], bis_bisogni_buffer)       # bisogni primari
+    save_block(custom_reader.pages[2:3], demografici_buffer)       # demografici
+    save_block(custom_reader.pages[3:4], obiezioni_buffer)         # obiezioni
+    save_block(custom_reader.pages[4:5], domande_buffer)           # domande
+    save_block(custom_reader.pages[5:6], competitor_buffer)        # competitor
+    save_block(custom_reader.pages[6:], derivati_buffer)           # bisogni derivati
     
 
 
-    c.save()
 
     # === NUOVO BLOCCO: Unisci il template standard con le pagine custom ===
     from PyPDF2 import PdfReader, PdfWriter
@@ -355,38 +386,46 @@ async def generate_pdf(body: PdfRequest):
     # Carica PDF standard (da Canva)
     template_reader = PdfReader(template_path)
 
-    # Carica PDF custom (generato con ReportLab)
-    custom_reader = PdfReader(buffer)
+    # Carica i blocchi custom
+    benefici_reader = PdfReader(benefici_buffer)
+    bisogni_reader = PdfReader(bis_bisogni_buffer)
+    demo_reader = PdfReader(demografici_buffer)
+    obiezioni_reader = PdfReader(obiezioni_buffer)
+    domande_reader = PdfReader(domande_buffer)
+    competitor_reader = PdfReader(competitor_buffer)
+    derivati_reader = PdfReader(derivati_buffer)
 
     # Writer per il PDF finale
     final_writer = PdfWriter()
 
-    # --- Inserisci le prime 3 pagine standard ---
+    # --- Inserisci prime 3 pagine standard ---
     for i in range(3):
         final_writer.add_page(template_reader.pages[i])
 
-    # --- Inserisci pagine custom dei benefici/bisogni/demografici ---
-    for page in custom_reader.pages[0:3]:
-        final_writer.add_page(page)
+    # --- Inserisci blocchi custom ---
+    for page in benefici_reader.pages: final_writer.add_page(page)
+    for page in bisogni_reader.pages: final_writer.add_page(page)
+    for page in demo_reader.pages: final_writer.add_page(page)
 
     # --- Inserisci pagina 4 standard ---
     final_writer.add_page(template_reader.pages[3])
 
-    # --- Inserisci pagine custom obiezioni/domande/competitor ---
-    for page in custom_reader.pages[3:6]:
-        final_writer.add_page(page)
+    # --- Inserisci altri blocchi custom ---
+    for page in obiezioni_reader.pages: final_writer.add_page(page)
+    for page in domande_reader.pages: final_writer.add_page(page)
+    for page in competitor_reader.pages: final_writer.add_page(page)
 
     # --- Inserisci pagine standard da 5 a 59 ---
     for i in range(4, 59):
         final_writer.add_page(template_reader.pages[i])
 
-    # --- Inserisci pagina custom bisogni derivati ---
-    for page in custom_reader.pages[6:]:
-        final_writer.add_page(page)
+    # --- Inserisci bisogni derivati ---
+    for page in derivati_reader.pages: final_writer.add_page(page)
 
-    # --- Aggiungi eventuali pagine restanti standard (dopo la 59) ---
+    # --- Inserisci eventuali pagine restanti ---
     for i in range(59, len(template_reader.pages)):
         final_writer.add_page(template_reader.pages[i])
+
 
     # Salva il risultato in un nuovo buffer
     final_buffer = io.BytesIO()
