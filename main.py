@@ -175,7 +175,49 @@ async def generate_pdf(body: PdfRequest):
             c.setFillColor(white)
             draw_page_header(c)  # aggiunge titolo fisso e paragrafo
             return page_height - 300  # riparte sotto il paragrafo fisso
+            
         return current_y
+
+    def draw_section_page(c, section_title, items, explanations):
+        """
+        Crea una nuova pagina con header fisso, titolo di sezione e lista punti.
+        """
+        # Nuova pagina con gradiente e header
+        c.showPage()
+        draw_vertical_gradient(c, page_width, page_height, top, mid, bottom)
+        c.setFillColor(white)
+        draw_page_header(c)
+
+        # Titolo sezione
+        c.setFont("Montserrat-Bold", 22)
+        c.drawString(81, page_height - 240, section_title)
+
+        # Punto di partenza sotto il titolo
+        y_pos = page_height - 300
+
+        # Ciclo sugli elementi
+        for idx, item in enumerate(items):
+            item = item.strip()
+            explanation = explanations[idx].strip() if idx < len(explanations) else ""
+
+            # Disegna "- item" in bold
+            c.setFont("Montserrat-Bold", 18)
+            text_item = f"- {item}"
+            c.drawString(100, y_pos, text_item)
+
+            # Calcola posizione X per continuare
+            x_offset = 100 + c.stringWidth(text_item, "Montserrat-Bold", 18)
+
+            # Disegna ": spiegazione" in regular
+            if explanation:
+                c.setFont("Montserrat-Regular", 18)
+                c.drawString(x_offset + 5, y_pos, f": {explanation}")
+
+            y_pos -= 26
+
+        return y_pos
+
+
 
      # Titolo + sottotitolo + paragrafo fisso
     benefici_raw = body.data.get("benefici_prodotti", "")
@@ -213,6 +255,7 @@ async def generate_pdf(body: PdfRequest):
         y_pos -= 26
 
     y_pos -= 40  # spazio extra prima della sezione successiva
+
 
 
     c.save()
