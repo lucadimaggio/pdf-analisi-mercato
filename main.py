@@ -197,51 +197,6 @@ async def generate_pdf(body: PdfRequest):
     y_pos -= 40  # spazio extra prima della sezione successiva
 
 
-    # Dati del cliente
-    c.setFont("Montserrat-Bold", 14)
-    c.setFillColor(white)
-    c.drawString(col_x_pos, y_pos, "DATI CLIENTE")
-    y_pos -= 20
-    
-    y_pos = draw_key_value(c, col_x_pos, y_pos, "Ragione Sociale:", body.data.get("ragione_sociale", ""), col_width)
-    y_pos -= 10
-    y_pos = draw_key_value(c, col_x_pos, y_pos, "Sito Web:", body.data.get("sito_web", ""), col_width)
-    y_pos -= 10
-    y_pos = draw_key_value(c, col_x_pos, y_pos, "Descrizione Business:", body.data.get("descrizione_business", ""), col_width)
-    y_pos -= 10
-    y_pos = draw_key_value(c, col_x_pos, y_pos, "Differenziazione:", body.data.get("differenziazione", ""), col_width)
-    y_pos -= 10
-    
-    # --- Nuova sezione per Target Demografico ---
-    y_pos -= 30
-    c.setFont("Montserrat-Bold", 14)
-    c.drawString(col_x_pos, y_pos, "TARGET DEMOGRAFICO")
-    y_pos -= 20
-    
-    target_data = body.data.get("target_demografico", {})
-    y_pos = draw_key_value(c, col_x_pos, y_pos, "Età:", target_data.get("eta", ""), col_width)
-    y_pos -= 10
-    y_pos = draw_key_value(c, col_x_pos, y_pos, "Genere:", target_data.get("genere", ""), col_width)
-    y_pos -= 10
-    y_pos = draw_key_value(c, col_x_pos, y_pos, "Professione:", target_data.get("professione", ""), col_width)
-    
-    # --- Nuove sezioni per Benefici e Obiezioni ---
-    y_pos -= 30
-    c.setFont("Montserrat-Bold", 14)
-    c.drawString(col_x_pos, y_pos, "BENEFICI E OBIEZIONI")
-    y_pos -= 20
-    
-    y_pos = draw_key_value(c, col_x_pos, y_pos, "Benefici:", body.data.get("benefici_prodotti", ""), col_width)
-    y_pos -= 10
-    y_pos = draw_key_value(c, col_x_pos, y_pos, "Obiezioni:", body.data.get("obiezioni", {}).get("necessita", ""), col_width)
-    
-    # --- Nuova sezione per Bisogni di Robbins ---
-    y_pos -= 30
-    c.setFont("Montserrat-Bold", 14)
-    c.drawString(col_x_pos, y_pos, "BISOGNI DI ROBBINS")
-    y_pos -= 20
-    y_pos = draw_paragraph(c, col_x_pos, y_pos, body.data.get("bisogni_robbins", ""), col_width)
-
     c.save()
 
     buffer.seek(0)
