@@ -81,7 +81,6 @@ async def generate_pdf(body: PdfRequest):
         c.drawString(x, y, title)
         
     
-    
     def draw_page_layout(c, title, subtitle, paragraph):
         # Titolo principale
         c.setFont("Montserrat-Bold", 36)  # grandezza proporzionata
