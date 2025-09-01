@@ -346,7 +346,54 @@ async def generate_pdf(body: PdfRequest):
 
     c.save()
 
-    buffer.seek(0)
-    return StreamingResponse(buffer, media_type="application/pdf", headers={
+    # === NUOVO BLOCCO: Unisci il template standard con le pagine custom ===
+    from PyPDF2 import PdfReader, PdfWriter
+
+    # Percorso del template
+    template_path = r"C:\Users\lucad\OneDrive\Desktop\Tutto\BaseForce\pdf-analisi-mercato\template analisi di mercato.pdf"
+
+    # Carica PDF standard (da Canva)
+    template_reader = PdfReader(template_path)
+
+    # Carica PDF custom (generato con ReportLab)
+    custom_reader = PdfReader(buffer)
+
+    # Writer per il PDF finale
+    final_writer = PdfWriter()
+
+    # --- Inserisci le prime 3 pagine standard ---
+    for i in range(3):
+        final_writer.add_page(template_reader.pages[i])
+
+    # --- Inserisci pagine custom dei benefici/bisogni/demografici ---
+    for page in custom_reader.pages[0:3]:
+        final_writer.add_page(page)
+
+    # --- Inserisci pagina 4 standard ---
+    final_writer.add_page(template_reader.pages[3])
+
+    # --- Inserisci pagine custom obiezioni/domande/competitor ---
+    for page in custom_reader.pages[3:6]:
+        final_writer.add_page(page)
+
+    # --- Inserisci pagine standard da 5 a 59 ---
+    for i in range(4, 59):
+        final_writer.add_page(template_reader.pages[i])
+
+    # --- Inserisci pagina custom bisogni derivati ---
+    for page in custom_reader.pages[6:]:
+        final_writer.add_page(page)
+
+    # --- Aggiungi eventuali pagine restanti standard (dopo la 59) ---
+    for i in range(59, len(template_reader.pages)):
+        final_writer.add_page(template_reader.pages[i])
+
+    # Salva il risultato in un nuovo buffer
+    final_buffer = io.BytesIO()
+    final_writer.write(final_buffer)
+    final_buffer.seek(0)
+
+
+    return StreamingResponse(final_buffer, media_type="application/pdf", headers={
         "Content-Disposition": "inline; filename=analisi.pdf"
     })
