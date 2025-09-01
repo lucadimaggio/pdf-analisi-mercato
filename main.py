@@ -280,6 +280,30 @@ async def generate_pdf(body: PdfRequest):
     # Crea nuova pagina con titolo e dati demografici
     draw_section_page(c, "Dati demografici:", demographics_labels, demographics_values)
 
+        # Recupera le obiezioni
+    obiezioni_data = body.data.get("obiezioni", {})
+    obiezioni_labels = ["Necessità di risolvere il problema", "Possibilità di trovare una soluzione", "Tipo di soluzione proposta", "Possibilità di raggiungere i risultati", "Credibilità azienda"]
+    obiezioni_values = [
+        obiezioni_data.get("necessita", ""),
+        obiezioni_data.get("possibilita", ""),
+        obiezioni_data.get("tipo", ""),
+        obiezioni_data.get("risultati", ""),
+        obiezioni_data.get("credibilita_azienda", ""),
+    ]
+
+    # Crea nuova pagina con titolo POSSIBILI DIFFICOLTÀ e obiezioni
+    draw_section_page(c, "Obiezioni:", obiezioni_labels, obiezioni_values)
+
+        # Recupera i bisogni derivati
+    bisogni_derivati_raw = body.data.get("bisogni_derivati", "")
+    bisogni_derivati_list = bisogni_derivati_raw.split("|") if bisogni_derivati_raw else []
+
+    spieg_bisogni_derivati_raw = body.data.get("spiegazione_bisogni_derivati", "")
+    spieg_bisogni_derivati_list = spieg_bisogni_derivati_raw.split("|") if spieg_bisogni_derivati_raw else []
+
+    # Crea nuova pagina con titolo e bisogni derivati
+    draw_section_page(c, "Bisogni Derivati:", bisogni_derivati_list, spieg_bisogni_derivati_list)
+
 
     c.save()
 
