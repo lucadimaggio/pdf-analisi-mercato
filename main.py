@@ -91,7 +91,7 @@ async def generate_pdf(body: PdfRequest):
         c.drawString(81, page_height - 176, "DATI RACCOLTI")
 
         # Paragrafo fisso
-        c.setFont("Montserrat-Regular", 22)
+        c.setFont("Montserrat-Bold", 22)
         c.drawString(81, page_height - 240, "Benefici dei prodotti:")
 
     
@@ -192,19 +192,25 @@ async def generate_pdf(body: PdfRequest):
     spiegazione_list = spiegazione_raw.split("|") if spiegazione_raw else []
 
     for idx, beneficio in enumerate(benefici_list):
-        y_pos = check_and_new_page(c, y_pos)
-        c.setFont("Montserrat-Regular", 18)
-        c.drawString(100, y_pos, f"- {beneficio.strip()}")
-        y_pos -= 22
+        beneficio = beneficio.strip()
+        spiegazione = spiegazione_list[idx].strip() if idx < len(spiegazione_list) else ""
 
-        # Se esiste una spiegazione corrispondente, stampala rientrata e più piccola
-        if idx < len(spiegazione_list):
-            spiegazione = spiegazione_list[idx].strip()
-            if spiegazione:
-                y_pos = check_and_new_page(c, y_pos)
-                c.setFont("Montserrat-Regular", 14)
-                c.drawString(120, y_pos, f"  → {spiegazione}")
-                y_pos -= 20
+        y_pos = check_and_new_page(c, y_pos)
+
+        # Disegna "- beneficio" in bold
+        c.setFont("Montserrat-Bold", 18)
+        text_beneficio = f"- {beneficio}"
+        c.drawString(100, y_pos, text_beneficio)
+
+        # Calcola posizione X per continuare dopo il beneficio
+        x_offset = 100 + c.stringWidth(text_beneficio, "Montserrat-Bold", 18)
+
+        # Disegna ": spiegazione" in regular
+        if spiegazione:
+            c.setFont("Montserrat-Regular", 18)
+            c.drawString(x_offset + 5, y_pos, f": {spiegazione}")
+
+        y_pos -= 26
 
     y_pos -= 40  # spazio extra prima della sezione successiva
 
