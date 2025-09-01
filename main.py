@@ -83,12 +83,12 @@ async def generate_pdf(body: PdfRequest):
     
     def draw_page_layout(c, title, subtitle, paragraph):
         # Titolo principale
-        c.setFont("Montserrat-Bold", 36)  # grandezza proporzionata
+        c.setFont("Montserrat-Bold", 60)  # grandezza proporzionata
         c.setFillColor(white)
         c.drawString(81, page_height - 81, title.upper())
 
         # Sottotitolo
-        c.setFont("Montserrat-Regular", 24)
+        c.setFont("Montserrat-Regular", 19.5)
         c.drawString(81, page_height - 176, subtitle.upper())
 
         # Paragrafo
