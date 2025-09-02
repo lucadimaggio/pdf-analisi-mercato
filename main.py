@@ -379,71 +379,96 @@ async def generate_pdf(body: PdfRequest):
 
 
 
-    # === NUOVO BLOCCO: Unisci il template standard con le pagine custom ===
-    from PyPDF2 import PdfReader, PdfWriter
-
-    # Percorso del template (relativo alla posizione di main.py)
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    template_path = os.path.join(base_dir, "templates", "template analisi di mercato.pdf")
-
-    # Log per verificare se il file esiste
-    logger.info(f"Percorso template: {template_path}")
-    logger.info(f"File esiste? {os.path.exists(template_path)}")
-
-    if not os.path.exists(template_path):
-        raise HTTPException(status_code=500, detail=f"Template PDF non trovato: {template_path}")
-
-    # Carica PDF standard (da Canva)
-    template_reader = PdfReader(template_path)
 
 
-    # Carica i blocchi custom
-    benefici_reader = PdfReader(benefici_buffer)
-    bisogni_reader = PdfReader(bis_bisogni_buffer)
-    demo_reader = PdfReader(demografici_buffer)
-    obiezioni_reader = PdfReader(obiezioni_buffer)
-    domande_reader = PdfReader(domande_buffer)
-    competitor_reader = PdfReader(competitor_buffer)
-    derivati_reader = PdfReader(derivati_buffer)
+    try:
+        # === NUOVO BLOCCO: Unisci il template standard con le pagine custom ===
 
-    # Writer per il PDF finale
-    final_writer = PdfWriter()
+        # Percorso del template (relativo alla posizione di main.py)
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        template_path = os.path.join(base_dir, "templates", "template_analisi.pdf")
 
-    # --- Inserisci prime 3 pagine standard ---
-    for i in range(3):
-        final_writer.add_page(template_reader.pages[i])
+        # Log per verificare se il file esiste
+        logger.info(f"Percorso template: {template_path}")
+        logger.info(f"File esiste? {os.path.exists(template_path)}")
 
-    # --- Inserisci blocchi custom ---
-    for page in benefici_reader.pages: final_writer.add_page(page)
-    for page in bisogni_reader.pages: final_writer.add_page(page)
-    for page in demo_reader.pages: final_writer.add_page(page)
+        # Stampa il contenuto della cartella templates
+        try:
+            logger.info(f"Contenuto cartella templates: {os.listdir(os.path.join(base_dir, 'templates'))}")
+        except Exception as e:
+            logger.warning(f"Impossibile leggere cartella templates: {str(e)}")
 
-    # --- Inserisci pagina 4 standard ---
-    final_writer.add_page(template_reader.pages[3])
+        if not os.path.exists(template_path):
+            raise HTTPException(status_code=500, detail=f"Template PDF non trovato: {template_path}")
 
-    # --- Inserisci altri blocchi custom ---
-    for page in obiezioni_reader.pages: final_writer.add_page(page)
-    for page in domande_reader.pages: final_writer.add_page(page)
-    for page in competitor_reader.pages: final_writer.add_page(page)
+        logger.info(f"Sto per aprire il template: {template_path}")
 
-    # --- Inserisci pagine standard da 5 a 59 ---
-    for i in range(4, 59):
-        final_writer.add_page(template_reader.pages[i])
+        try:
+            template_reader = PdfReader(template_path)
+            logger.info(f"Template caricato con {len(template_reader.pages)} pagine")
+        except Exception as e:
+            logger.error(f"Errore durante l'apertura del template: {str(e)}", exc_info=True)
+            raise HTTPException(status_code=500, detail=f"Errore lettura template: {str(e)}")
 
-    # --- Inserisci bisogni derivati ---
-    for page in derivati_reader.pages: final_writer.add_page(page)
+        # Carica i blocchi custom
+        benefici_reader = PdfReader(benefici_buffer)
+        bisogni_reader = PdfReader(bis_bisogni_buffer)
+        demo_reader = PdfReader(demografici_buffer)
+        obiezioni_reader = PdfReader(obiezioni_buffer)
+        domande_reader = PdfReader(domande_buffer)
+        competitor_reader = PdfReader(competitor_buffer)
+        derivati_reader = PdfReader(derivati_buffer)
 
-    # --- Inserisci eventuali pagine restanti ---
-    for i in range(59, len(template_reader.pages)):
-        final_writer.add_page(template_reader.pages[i])
+        logger.info(f"Benefici_buffer: {len(benefici_reader.pages)} pagine")
+        logger.info(f"Bisogni_buffer: {len(bisogni_reader.pages)} pagine")
+        logger.info(f"Demografici_buffer: {len(demo_reader.pages)} pagine")
+        logger.info(f"Obiezioni_buffer: {len(obiezioni_reader.pages)} pagine")
+        logger.info(f"Domande_buffer: {len(domande_reader.pages)} pagine")
+        logger.info(f"Competitor_buffer: {len(competitor_reader.pages)} pagine")
+        logger.info(f"Derivati_buffer: {len(derivati_reader.pages)} pagine")
 
+        # Writer per il PDF finale
+        final_writer = PdfWriter()
+        logger.info(f"Template ha {len(template_reader.pages)} pagine totali")
 
-    # Salva il risultato in un nuovo buffer
-    final_buffer = io.BytesIO()
-    final_writer.write(final_buffer)
-    final_buffer.seek(0)
+        # --- Inserisci prime 3 pagine standard (se esistono) ---
+        for i in range(min(3, len(template_reader.pages))):
+            final_writer.add_page(template_reader.pages[i])
 
+        # --- Inserisci blocchi custom ---
+        for page in benefici_reader.pages: final_writer.add_page(page)
+        for page in bisogni_reader.pages: final_writer.add_page(page)
+        for page in demo_reader.pages: final_writer.add_page(page)
 
-    return StreamingResponse(final_buffer, media_type="application/pdf", headers={
-        "Content-Disposition": "inline; filename=analisi.pdf"
-    })
+        # --- Inserisci pagina 4 standard (se esiste) ---
+        if len(template_reader.pages) > 3:
+            final_writer.add_page(template_reader.pages[3])
+
+        # --- Inserisci altri blocchi custom ---
+        for page in obiezioni_reader.pages: final_writer.add_page(page)
+        for page in domande_reader.pages: final_writer.add_page(page)
+        for page in competitor_reader.pages: final_writer.add_page(page)
+
+        # --- Inserisci pagine standard da 5 a 59 (se esistono) ---
+        for i in range(4, min(59, len(template_reader.pages))):
+            final_writer.add_page(template_reader.pages[i])
+
+        # --- Inserisci bisogni derivati ---
+        for page in derivati_reader.pages: final_writer.add_page(page)
+
+        # --- Inserisci eventuali pagine restanti ---
+        for i in range(59, len(template_reader.pages)):
+            final_writer.add_page(template_reader.pages[i])
+
+        # Salva il risultato in un nuovo buffer
+        final_buffer = io.BytesIO()
+        final_writer.write(final_buffer)
+        final_buffer.seek(0)
+
+        return StreamingResponse(final_buffer, media_type="application/pdf", headers={
+            "Content-Disposition": "inline; filename=analisi.pdf"
+        })
+
+    except Exception as e:
+        logger.error(f"Errore generazione PDF: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Errore PDF: {str(e)}")
