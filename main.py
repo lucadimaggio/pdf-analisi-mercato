@@ -85,37 +85,39 @@ async def generate_pdf(body: PdfRequest):
 
     def draw_page_header(c):
         # Titolo principale
-        c.setFont("Montserrat-Bold", int(60 * scale))
+        c.setFont("Montserrat-Bold", 80)
         c.setFillColor(white)
-        c.drawString(81, page_height - int(81 * scale), "ANALISI DI MERCATO")
+        c.drawString(493, 675, "ANALISI DI MERCATO")
 
         # Sottotitolo
-        c.setFont("Montserrat-Regular", int(19.5 * scale))
-        c.drawString(81, page_height - int(176 * scale), "DATI RACCOLTI")
+        c.setFont("Montserrat-Regular", 26)
+        c.drawString(253, 626, "DATI RACCOLTI")
+
 
         # Paragrafo fisso
-        c.setFont("Montserrat-Bold", int(22 * scale))
-        c.drawString(81, page_height - int(240 * scale), "Benefici dei prodotti:")
+        c.setFont("Montserrat-Bold", 29)
+        c.drawString(348, 472, "Benefici dei prodotti:")
 
     
     def draw_page_layout(c, title, subtitle, paragraph):
         # Titolo principale
-        c.setFont("Montserrat-Bold", int(60 * scale))  # grandezza proporzionata
+        c.setFont("Montserrat-Bold", 80)
+        # grandezza proporzionata
         c.setFillColor(white)
-        c.drawString(81, page_height - int(81 * scale), title.upper())
+        c.drawString(493, 675, "ANALISI DI MERCATO")
 
         # Sottotitolo
-        c.setFont("Montserrat-Regular", int(19.5 * scale))
-        c.drawString(81, page_height - int(176 * scale), subtitle.upper())
+        c.setFont("Montserrat-Regular", 26)
+        c.drawString(253, 626, subtitle.upper())
 
         # Paragrafo
-        c.setFont("Montserrat-Regular", int(22 * scale))
-        text_lines = simpleSplit(paragraph, "Montserrat-Regular", int(22 * scale), int(1278 * scale))
-        current_y = page_height - int(240 * scale)
+        c.setFont("Montserrat-Regular", 29)
+        text_lines = simpleSplit(paragraph, "Montserrat-Regular", 29, 825)
+        current_y = 472
         for line in text_lines:
             current_y = check_and_new_page(c, current_y)
             c.drawString(81, current_y, line)
-            current_y -= int(26 * scale)
+            current_y -= 22
 
         return current_y
     
@@ -146,8 +148,7 @@ async def generate_pdf(body: PdfRequest):
     # Dimensioni della pagina 16:9 in punti (da 1440x810 px, a 96 DPI)
     # 1440 px / 96 dpi * 72 pt/pollice = 1080 pt
     # 810 px / 96 dpi * 72 pt/pollice = 607.5 pt
-    page_size = (1920, 1080)
-    scale = 1920 / 1080
+    page_size = (1440, 810)
     c = canvas.Canvas(buffer, pagesize=page_size)
 
     # Posizionamento
@@ -165,8 +166,8 @@ async def generate_pdf(body: PdfRequest):
     white = HexColor("#FFFFFF")
 
     
-    margin = int(81 * scale)           # ≈ 144
-    bottom_margin = int(60 * scale)    # ≈ 106
+    margin = 81           # ≈ 144
+    bottom_margin = 60     # ≈ 106
     col_width = 450
     col_x_pos = margin
     content_x_pos = col_x_pos + col_width + margin
@@ -178,7 +179,7 @@ async def generate_pdf(body: PdfRequest):
             draw_vertical_gradient(c, page_width, page_height, top, mid, bottom)
             c.setFillColor(white)
             draw_page_header(c)  # aggiunge titolo fisso e paragrafo
-            return page_height - int(300 * scale)  # riparte sotto il paragrafo fisso
+            return page_height - 300  # riparte sotto il paragrafo fisso
             
         return current_y
 
@@ -193,11 +194,11 @@ async def generate_pdf(body: PdfRequest):
         draw_page_header(c)
 
         # Titolo sezione
-        c.setFont("Montserrat-Bold", int(22 * scale))
-        c.drawString(81, page_height - int(240 * scale), section_title)
+        c.setFont("Montserrat-Bold", 29)
+        c.drawString(348, 472, section_title)
 
         # Punto di partenza sotto il titolo
-        y_pos = page_height - int(300 * scale)
+        y_pos = page_height - 300
 
         # Ciclo sugli elementi
         for idx, item in enumerate(items):
@@ -205,22 +206,20 @@ async def generate_pdf(body: PdfRequest):
             explanation = explanations[idx].strip() if idx < len(explanations) else ""
 
             # Disegna "- item" in bold
-            c.setFont("Montserrat-Bold", int(18 * scale))
+            c.setFont("Montserrat-Bold", 18)
             text_item = f"- {item}"
-            c.drawString(int(100 * scale), y_pos, text_item)
-            y_pos -= int(26 * scale)
+            c.drawString(100, y_pos, text_item)
+            y_pos -= 26
 
-            # Disegna la spiegazione sempre sotto, con wrapping
             if explanation:
-                c.setFont("Montserrat-Regular", int(18 * scale))
-                text_lines = simpleSplit(explanation, "Montserrat-Regular", int(18 * scale), page_width - int(200 * scale))
+                c.setFont("Montserrat-Regular", 18)
+                text_lines = simpleSplit(explanation, "Montserrat-Regular", 18, page_width - 200)
                 for line in text_lines:
                     y_pos = check_and_new_page(c, y_pos)
-                    c.drawString(int(120 * scale), y_pos, line)  # indentata rispetto all’item
-                    y_pos -= int(22 * scale)
+                    c.drawString(120, y_pos, line)
+                    y_pos -= 22
 
-            # Spazio extra dopo ogni blocco item+spiegazione
-            y_pos -= int(20 * scale)
+            y_pos -= 20
 
 
         return y_pos
@@ -235,7 +234,7 @@ async def generate_pdf(body: PdfRequest):
     draw_page_header(c)
 
     # Punto di partenza sotto il paragrafo fisso
-    y_pos = page_height - int(300 * scale)
+    y_pos = page_height - 300
 
     # Stampa i benefici dinamici con relative spiegazioni
     spiegazione_raw = body.data.get("spiegazione_benefici_prodotti", "")
@@ -248,24 +247,24 @@ async def generate_pdf(body: PdfRequest):
         y_pos = check_and_new_page(c, y_pos)
 
     # Disegna "- beneficio" in bold
-    c.setFont("Montserrat-Bold", int(18 * scale))
+    c.setFont("Montserrat-Bold", 18)
     text_beneficio = f"- {beneficio}"
-    c.drawString(int(100 * scale), y_pos, text_beneficio)
-    y_pos -= int(26 * scale)
+    c.drawString(100, y_pos, text_beneficio)
+    y_pos -= 26
 
-    # Disegna la spiegazione sempre sotto, con wrapping
+    # Spiegazione sotto, indentata
     if spiegazione:
-        c.setFont("Montserrat-Regular", int(18 * scale))
-        text_lines = simpleSplit(spiegazione, "Montserrat-Regular", int(18 * scale), page_width - int(200 * scale))
+        c.setFont("Montserrat-Regular", 18)
+        text_lines = simpleSplit(spiegazione, "Montserrat-Regular", 18, page_width - 200)
         for line in text_lines:
             y_pos = check_and_new_page(c, y_pos)
-            c.drawString(int(120 * scale), y_pos, line)  # indentata rispetto al beneficio
-            y_pos -= int(22 * scale)
+            c.drawString(120, y_pos, line)
+            y_pos -= 22
 
-    # Spazio extra dopo ogni blocco beneficio+spiegazione
-    y_pos -= int(20 * scale)
+    # Spazio extra tra blocchi
+    y_pos -= 20
 
-    y_pos -= int(40 * scale)  # spazio extra prima della sezione successiva
+    y_pos -= 40  # spazio extra prima della sezione successiva
 
 
     # Recupera i dati dei bisogni di Robbins
@@ -322,37 +321,36 @@ async def generate_pdf(body: PdfRequest):
     c.setFillColor(white)
 
     # Header della pagina
-    c.setFont("Montserrat-Bold", int(60 * scale))
-    c.drawString(81, page_height - int(81 * scale), "ANALISI DI MERCATO")
+    c.setFont("Montserrat-Bold", 80)
+    c.drawString(493, 675, "ANALISI DI MERCATO")
 
-    c.setFont("Montserrat-Regular", int(19.5 * scale))
-    c.drawString(81, page_height - int(176 * scale), "POSSIBILI DIFFICOLTÀ")
 
-    # Paragrafo Competitor diretti
-    y_pos = page_height - int(260 * scale)
-    c.setFont("Montserrat-Bold", int(18 * scale))
+    c.setFont("Montserrat-Regular", 26)
+    c.drawString(253, 626, "POSSIBILI DIFFICOLTÀ")
+
+    c.setFont("Montserrat-Bold", 18)
     c.drawString(81, y_pos, "Competitor diretti:")
-    c.setFont("Montserrat-Regular", int(18 * scale))
-    c.setFont("Montserrat-Regular", int(18 * scale))
-    text_lines = simpleSplit(f"Questi brand vendono articoli simili a quelli offerti da {sito_web} e operano nel nostro stesso mercato.", 
-                         "Montserrat-Regular", int(18 * scale), page_width - int(200 * scale))
+
+    c.setFont("Montserrat-Regular", 18)
+    text_lines = simpleSplit(f"Questi brand vendono articoli simili a quelli offerti da {sito_web} e operano nel nostro stesso mercato.",
+                            "Montserrat-Regular", 18, page_width - 200)
     for line in text_lines:
         y_pos = check_and_new_page(c, y_pos)
-        c.drawString(int(120 * scale), y_pos, line)
-        y_pos -= int(22 * scale)
+        c.drawString(120, y_pos, line)
+        y_pos -= 22
 
 
     # Paragrafo Competitor indiretti
-    y_pos -= int(60 * scale)
-    c.setFont("Montserrat-Bold", int(18 * scale))
+    y_pos -= 60
+    c.setFont("Montserrat-Bold", 18)
     c.drawString(81, y_pos, "Competitor indiretti:")
-    c.setFont("Montserrat-Regular", int(18 * scale))
+    c.setFont("Montserrat-Regular", 18)
     text_lines = simpleSplit(f"Questi sono brand che soddisfano bisogni simili a quelli di {sito_web}, ma operano in mercati differenti.", 
-                            "Montserrat-Regular", int(18 * scale), page_width - int(200 * scale))
+                            "Montserrat-Regular", 18, page_width - 200)
     for line in text_lines:
         y_pos = check_and_new_page(c, y_pos)
-        c.drawString(int(120 * scale), y_pos, line)
-        y_pos -= int(22 * scale)
+        c.drawString(120, y_pos, line)
+        y_pos -= 22
 
 
     # Recupera i bisogni derivati
@@ -486,9 +484,12 @@ async def generate_pdf(body: PdfRequest):
         final_writer.write(final_buffer)
         final_buffer.seek(0)
 
+        nome_cliente = body.data.get("nome_cliente", "cliente")
+
         return StreamingResponse(final_buffer, media_type="application/pdf", headers={
-            "Content-Disposition": "inline; filename=analisi.pdf"
-        })
+            "Content-Disposition": f"inline; filename=analisi_{nome_cliente}.pdf"
+})
+
 
     except Exception as e:
         logger.error(f"Errore generazione PDF: {str(e)}", exc_info=True)
