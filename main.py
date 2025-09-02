@@ -19,6 +19,7 @@ from PyPDF2 import PdfReader, PdfWriter
 # Registra i font Montserrat
 pdfmetrics.registerFont(TTFont("Montserrat-Regular", "fonts/Montserrat-Regular.ttf"))
 pdfmetrics.registerFont(TTFont("Montserrat-Bold", "fonts/Montserrat-Bold.ttf"))
+pdfmetrics.registerFont(TTFont("Montserrat-ExtraBold", "fonts/Montserrat-ExtraBold.ttf"))
 
 
 # Imposta il logger
@@ -85,7 +86,7 @@ async def generate_pdf(body: PdfRequest):
 
     def draw_page_header(c):
         # Titolo principale
-        c.setFont("Montserrat-Bold", 80)
+        c.setFont("Montserrat-ExtraBold", 80)
         c.setFillColor(white)
         c.drawString(493, 675, "ANALISI DI MERCATO")
 
@@ -101,7 +102,7 @@ async def generate_pdf(body: PdfRequest):
     
     def draw_page_layout(c, title, subtitle, paragraph):
         # Titolo principale
-        c.setFont("Montserrat-Bold", 80)
+        c.setFont("Montserrat-ExtraBold", 80)
         # grandezza proporzionata
         c.setFillColor(white)
         c.drawString(493, 675, "ANALISI DI MERCATO")
@@ -113,7 +114,7 @@ async def generate_pdf(body: PdfRequest):
         # Paragrafo
         c.setFont("Montserrat-Regular", 29)
         text_lines = simpleSplit(paragraph, "Montserrat-Regular", 29, 825)
-        current_y = 472
+        current_y = 338
         for line in text_lines:
             current_y = check_and_new_page(c, current_y)
             c.drawString(348, current_y, line)
@@ -321,7 +322,7 @@ async def generate_pdf(body: PdfRequest):
     c.setFillColor(white)
 
     # Header della pagina
-    c.setFont("Montserrat-Bold", 80)
+    c.setFont("Montserrat-ExtraBold", 80)
     c.drawString(493, 675, "ANALISI DI MERCATO")
 
 
