@@ -207,14 +207,14 @@ async def generate_pdf(body: PdfRequest):
             explanation = explanations[idx].strip() if idx < len(explanations) else ""
 
             # Disegna "- item" in bold
-            c.setFont("Montserrat-Bold", 18)
+            c.setFont("Montserrat-Bold", 29.2)
             text_item = f"- {item}"
             c.drawString(100, y_pos, text_item)
             y_pos -= 26
 
             if explanation:
-                c.setFont("Montserrat-Regular", 18)
-                text_lines = simpleSplit(explanation, "Montserrat-Regular", 18, page_width - 200)
+                c.setFont("Montserrat-Regular", 29.2)
+                text_lines = simpleSplit(explanation, "Montserrat-Regular", 29.2, page_width - 200)
                 for line in text_lines:
                     y_pos = check_and_new_page(c, y_pos)
                     c.drawString(120, y_pos, line)
@@ -248,15 +248,15 @@ async def generate_pdf(body: PdfRequest):
         y_pos = check_and_new_page(c, y_pos)
 
     # Disegna "- beneficio" in bold
-    c.setFont("Montserrat-Bold", 18)
+    c.setFont("Montserrat-Bold", 29.2)
     text_beneficio = f"- {beneficio}"
     c.drawString(100, y_pos, text_beneficio)
     y_pos -= 26
 
     # Spiegazione sotto, indentata
     if spiegazione:
-        c.setFont("Montserrat-Regular", 18)
-        text_lines = simpleSplit(spiegazione, "Montserrat-Regular", 18, page_width - 200)
+        c.setFont("Montserrat-Regular", 29.2)
+        text_lines = simpleSplit(spiegazione, "Montserrat-Regular", 29.2, page_width - 200)
         for line in text_lines:
             y_pos = check_and_new_page(c, y_pos)
             c.drawString(120, y_pos, line)
@@ -329,12 +329,12 @@ async def generate_pdf(body: PdfRequest):
     c.setFont("Montserrat-Regular", 26)
     c.drawString(348, 626, "POSSIBILI DIFFICOLTÀ")
 
-    c.setFont("Montserrat-Bold", 18)
+    c.setFont("Montserrat-Bold", 29.2)
     c.drawString(81, y_pos, "Competitor diretti:")
 
-    c.setFont("Montserrat-Regular", 18)
+    c.setFont("Montserrat-Regular", 29.2)
     text_lines = simpleSplit(f"Questi brand vendono articoli simili a quelli offerti da {sito_web} e operano nel nostro stesso mercato.",
-                            "Montserrat-Regular", 18, page_width - 200)
+                            "Montserrat-Regular", 29.2, page_width - 200)
     for line in text_lines:
         y_pos = check_and_new_page(c, y_pos)
         c.drawString(120, y_pos, line)
@@ -343,11 +343,11 @@ async def generate_pdf(body: PdfRequest):
 
     # Paragrafo Competitor indiretti
     y_pos -= 60
-    c.setFont("Montserrat-Bold", 18)
+    c.setFont("Montserrat-Bold", 29.2)
     c.drawString(81, y_pos, "Competitor indiretti:")
-    c.setFont("Montserrat-Regular", 18)
+    c.setFont("Montserrat-Regular", 29.2)
     text_lines = simpleSplit(f"Questi sono brand che soddisfano bisogni simili a quelli di {sito_web}, ma operano in mercati differenti.", 
-                            "Montserrat-Regular", 18, page_width - 200)
+                            "Montserrat-Regular", 29.2, page_width - 200)
     for line in text_lines:
         y_pos = check_and_new_page(c, y_pos)
         c.drawString(120, y_pos, line)
