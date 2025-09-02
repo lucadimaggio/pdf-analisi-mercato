@@ -12,6 +12,8 @@ from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.colors import HexColor, Color
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from PyPDF2 import PdfReader, PdfWriter
+
 
 
 # Registra i font Montserrat
