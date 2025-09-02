@@ -216,6 +216,7 @@ async def generate_pdf(body: PdfRequest):
             
         return current_y
 
+
     def draw_benefici_section(c, page_width, page_height, data):
         benefici_raw = data.get("benefici_prodotti", "")
         benefici_list = benefici_raw.split("|") if benefici_raw else []
@@ -224,29 +225,42 @@ async def generate_pdf(body: PdfRequest):
         spiegazione_list = spiegazione_raw.split("|") if spiegazione_raw else []
 
         y_pos = page_height - 300
+        count = 0  # contatore benefici nella pagina
+        max_per_page = 2
 
         for idx, beneficio in enumerate(benefici_list):
             beneficio = beneficio.strip()
             spiegazione = spiegazione_list[idx].strip() if idx < len(spiegazione_list) else ""
 
-            y_pos = check_and_new_page(c, y_pos, subtitle="BENEFICI")
+            # Se ho già stampato 2 benefici, forzo nuova pagina
+            if count >= max_per_page:
+                c.showPage()
+                draw_vertical_gradient(c, page_width, page_height, HexColor("#000000"), HexColor("#001373"), HexColor("#000000"))
+                c.setFillColor(HexColor("#FFFFFF"))
+                draw_page_header(c)
+                c.setFont("Montserrat-Regular", 26)
+                c.drawString(100, 626, "BENEFICI PER IL CLIENTE")
+                y_pos = page_height - 300
+                count = 0
 
-            # Disegna "- beneficio" in bold
+            # Disegna beneficio
             c.setFont("Montserrat-Bold", 29.2)
             text_beneficio = f"- {beneficio}"
             c.drawString(100, y_pos, text_beneficio)
             y_pos -= 26
 
-            # Spiegazione sotto, indentata
+            # Disegna spiegazione
             if spiegazione:
                 c.setFont("Montserrat-Regular", 29.2)
                 text_lines = simpleSplit(spiegazione, "Montserrat-Regular", 29.2, page_width - 200)
                 for line in text_lines:
-                    y_pos = check_and_new_page(c, y_pos, subtitle="BENEFICI")
+                    y_pos = check_and_new_page(c, y_pos, subtitle="BENEFICI PER IL CLIENTE")
                     c.drawString(120, y_pos, line)
                     y_pos -= 22
 
             y_pos -= 20
+            count += 1
+    
     def draw_bisogni_section(c, page_width, page_height, data):
         bisogni_raw = data.get("bisogni_robbins", "")
         bisogni_list = bisogni_raw.split("|") if bisogni_raw else []
@@ -255,19 +269,27 @@ async def generate_pdf(body: PdfRequest):
         spieg_bisogni_list = spieg_bisogni_raw.split("|") if spieg_bisogni_raw else []
 
         y_pos = page_height - 300
+        count = 0
+        max_per_page = 2
 
         for idx, bisogno in enumerate(bisogni_list):
             bisogno = bisogno.strip()
             spiegazione = spieg_bisogni_list[idx].strip() if idx < len(spieg_bisogni_list) else ""
 
-            y_pos = check_and_new_page(c, y_pos, subtitle="BISOGNI PRIMARI (ROBBINS)")
+            if count >= max_per_page:
+                c.showPage()
+                draw_vertical_gradient(c, page_width, page_height, HexColor("#000000"), HexColor("#001373"), HexColor("#000000"))
+                c.setFillColor(HexColor("#FFFFFF"))
+                draw_page_header(c)
+                c.setFont("Montserrat-Regular", 26)
+                c.drawString(100, 626, "BISOGNI PRIMARI (ROBBINS)")
+                y_pos = page_height - 300
+                count = 0
 
-            # Disegna "- bisogno" in bold
             c.setFont("Montserrat-Bold", 29.2)
             c.drawString(100, y_pos, f"- {bisogno}")
             y_pos -= 32
 
-            # Spiegazione sotto
             if spiegazione:
                 c.setFont("Montserrat-Regular", 29.2)
                 text_lines = simpleSplit(spiegazione, "Montserrat-Regular", 29.2, page_width - 200)
@@ -275,6 +297,9 @@ async def generate_pdf(body: PdfRequest):
                     y_pos = check_and_new_page(c, y_pos, subtitle="BISOGNI PRIMARI (ROBBINS)")
                     c.drawString(120, y_pos, line)
                     y_pos -= 26
+
+            y_pos -= 20
+            count += 1
 
     def draw_demografici_section(c, page_width, page_height, data):
         target = data.get("target_demografico", {})
@@ -315,17 +340,21 @@ async def generate_pdf(body: PdfRequest):
             obiezioni_data.get("credibilita_azienda", "")
         ]
 
-        y_pos = page_height - 300
-
         for label, value in zip(obiezioni_labels, obiezioni_values):
-            y_pos = check_and_new_page(c, y_pos, subtitle="OBIEZIONI")
+            # Forza sempre una nuova pagina
+            c.showPage()
+            draw_vertical_gradient(c, page_width, page_height, HexColor("#000000"), HexColor("#001373"), HexColor("#000000"))
+            c.setFillColor(HexColor("#FFFFFF"))
+            draw_page_header(c)
+            c.setFont("Montserrat-Regular", 26)
+            c.drawString(100, 626, "OBIEZIONI")
 
-            # Titolo obiezione
+            y_pos = page_height - 300
+
             c.setFont("Montserrat-Bold", 29.2)
             c.drawString(100, y_pos, f"- {label}")
             y_pos -= 32
 
-            # Spiegazione sotto
             if value:
                 c.setFont("Montserrat-Regular", 29.2)
                 text_lines = simpleSplit(value, "Montserrat-Regular", 29.2, page_width - 200)
@@ -335,6 +364,7 @@ async def generate_pdf(body: PdfRequest):
                     y_pos -= 26
 
             y_pos -= 20
+
 
     def draw_domande_section(c, page_width, page_height, data):
         domande_raw = data.get("domande_tecniche", "")
@@ -398,12 +428,22 @@ async def generate_pdf(body: PdfRequest):
         spieg_bisogni_derivati_list = spieg_bisogni_derivati_raw.split("|") if spieg_bisogni_derivati_raw else []
 
         y_pos = page_height - 300
+        count = 0
+        max_per_page = 2
 
         for idx, bisogno in enumerate(bisogni_derivati_list):
             bisogno = bisogno.strip()
             spiegazione = spieg_bisogni_derivati_list[idx].strip() if idx < len(spieg_bisogni_derivati_list) else ""
 
-            y_pos = check_and_new_page(c, y_pos, subtitle="BISOGNI DERIVATI")
+            if count >= max_per_page:
+                c.showPage()
+                draw_vertical_gradient(c, page_width, page_height, HexColor("#000000"), HexColor("#001373"), HexColor("#000000"))
+                c.setFillColor(HexColor("#FFFFFF"))
+                draw_page_header(c)
+                c.setFont("Montserrat-Regular", 26)
+                c.drawString(100, 626, "BISOGNI DERIVATI")
+                y_pos = page_height - 300
+                count = 0
 
             c.setFont("Montserrat-Bold", 29.2)
             c.drawString(100, y_pos, f"- {bisogno}")
@@ -418,7 +458,7 @@ async def generate_pdf(body: PdfRequest):
                     y_pos -= 26
 
             y_pos -= 20
-
+            count += 1
 
 
     def draw_section_page(c, section_title, items, explanations):
@@ -465,7 +505,7 @@ async def generate_pdf(body: PdfRequest):
 
 
     benefici_buffer = render_section_to_buffer(
-    "BENEFICI",
+    "BENEFICI PER IL CLIENTE",
     lambda c, w, h: draw_benefici_section(c, w, h, body.data)
 )
 
