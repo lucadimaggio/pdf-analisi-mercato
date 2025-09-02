@@ -17,9 +17,9 @@ from PyPDF2 import PdfReader, PdfWriter
 
 
 # Registra i font Montserrat
-pdfmetrics.registerFont(TTFont("Montserrat-Regular", "fonts/Montserrat-Regular.ttf"))
-pdfmetrics.registerFont(TTFont("Montserrat-Bold", "fonts/Montserrat-Bold.ttf"))
-pdfmetrics.registerFont(TTFont("Montserrat-ExtraBold", "fonts/Montserrat-ExtraBold.ttf"))
+pdfmetrics.registerFont(TTFont("Montserrat-Regular", "fonts/Montserrat-Regular.ttf", subfontIndex=0))
+pdfmetrics.registerFont(TTFont("Montserrat-Bold", "fonts/Montserrat-Bold.ttf", subfontIndex=0))
+pdfmetrics.registerFont(TTFont("Montserrat-ExtraBold", "fonts/Montserrat-ExtraBold.ttf", subfontIndex=0))
 
 
 # Imposta il logger
@@ -282,7 +282,7 @@ async def generate_pdf(body: PdfRequest):
                 c.setFillColor(HexColor("#FFFFFF"))
                 draw_page_header(c)
                 c.setFont("Montserrat-Regular", 26)
-                c.drawString(100, 626, "BISOGNI PRIMARI (ROBBINS)")
+                c.drawString(100, 626, "BISOGNI PRIMARI (SECONDO LA TEORIA DI ROBBINS)")
                 y_pos = page_height - 300
                 count = 0
 
@@ -294,7 +294,7 @@ async def generate_pdf(body: PdfRequest):
                 c.setFont("Montserrat-Regular", 29.2)
                 text_lines = simpleSplit(spiegazione, "Montserrat-Regular", 29.2, page_width - 200)
                 for line in text_lines:
-                    y_pos = check_and_new_page(c, y_pos, subtitle="BISOGNI PRIMARI (ROBBINS)")
+                    y_pos = check_and_new_page(c, y_pos, subtitle="BISOGNI PRIMARI (SECONDO LA TEORIA DI ROBBINS)")
                     c.drawString(120, y_pos, line)
                     y_pos -= 36
 
