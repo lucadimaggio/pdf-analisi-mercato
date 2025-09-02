@@ -382,11 +382,20 @@ async def generate_pdf(body: PdfRequest):
     # === NUOVO BLOCCO: Unisci il template standard con le pagine custom ===
     from PyPDF2 import PdfReader, PdfWriter
 
-    # Percorso del template
-    template_path = r"C:\Users\lucad\OneDrive\Desktop\Tutto\BaseForce\pdf-analisi-mercato\template analisi di mercato.pdf"
+    # Percorso del template (relativo alla posizione di main.py)
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    template_path = os.path.join(base_dir, "templates", "template analisi di mercato.pdf")
+
+    # Log per verificare se il file esiste
+    logger.info(f"Percorso template: {template_path}")
+    logger.info(f"File esiste? {os.path.exists(template_path)}")
+
+    if not os.path.exists(template_path):
+        raise HTTPException(status_code=500, detail=f"Template PDF non trovato: {template_path}")
 
     # Carica PDF standard (da Canva)
     template_reader = PdfReader(template_path)
+
 
     # Carica i blocchi custom
     benefici_reader = PdfReader(benefici_buffer)
