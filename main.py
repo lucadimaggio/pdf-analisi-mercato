@@ -116,7 +116,7 @@ async def generate_pdf(body: PdfRequest):
         current_y = 472
         for line in text_lines:
             current_y = check_and_new_page(c, current_y)
-            c.drawString(81, current_y, line)
+            c.drawString(348, current_y, line)
             current_y -= 22
 
         return current_y
