@@ -247,7 +247,7 @@ async def generate_pdf(body: PdfRequest):
             c.setFont("Montserrat-Bold", 29.2)
             text_beneficio = f"- {beneficio}"
             c.drawString(100, y_pos, text_beneficio)
-            y_pos -= 26
+            y_pos -= 36
 
             # Disegna spiegazione
             if spiegazione:
@@ -256,9 +256,9 @@ async def generate_pdf(body: PdfRequest):
                 for line in text_lines:
                     y_pos = check_and_new_page(c, y_pos, subtitle="BENEFICI PER IL CLIENTE")
                     c.drawString(120, y_pos, line)
-                    y_pos -= 22
+                    y_pos -= 36
 
-            y_pos -= 20
+            y_pos -= 30
             count += 1
     
     def draw_bisogni_section(c, page_width, page_height, data):
@@ -288,7 +288,7 @@ async def generate_pdf(body: PdfRequest):
 
             c.setFont("Montserrat-Bold", 29.2)
             c.drawString(100, y_pos, f"- {bisogno}")
-            y_pos -= 32
+            y_pos -= 36
 
             if spiegazione:
                 c.setFont("Montserrat-Regular", 29.2)
@@ -296,9 +296,9 @@ async def generate_pdf(body: PdfRequest):
                 for line in text_lines:
                     y_pos = check_and_new_page(c, y_pos, subtitle="BISOGNI PRIMARI (ROBBINS)")
                     c.drawString(120, y_pos, line)
-                    y_pos -= 26
+                    y_pos -= 36
 
-            y_pos -= 20
+            y_pos -= 30
             count += 1
 
     def draw_demografici_section(c, page_width, page_height, data):
@@ -319,7 +319,7 @@ async def generate_pdf(body: PdfRequest):
 
             c.setFont("Montserrat-Bold", 29.2)
             c.drawString(100, y_pos, f"- {label}: {value}")
-            y_pos -= 32
+            y_pos -= 36
 
     def draw_obiezioni_section(c, page_width, page_height, data):
         obiezioni_data = data.get("obiezioni", {})
@@ -353,7 +353,7 @@ async def generate_pdf(body: PdfRequest):
 
             c.setFont("Montserrat-Bold", 29.2)
             c.drawString(100, y_pos, f"- {label}")
-            y_pos -= 32
+            y_pos -= 36
 
             if value:
                 c.setFont("Montserrat-Regular", 29.2)
@@ -361,9 +361,9 @@ async def generate_pdf(body: PdfRequest):
                 for line in text_lines:
                     y_pos = check_and_new_page(c, y_pos, subtitle="OBIEZIONI")
                     c.drawString(120, y_pos, line)
-                    y_pos -= 26
+                    y_pos -= 36
 
-            y_pos -= 20
+            y_pos -= 30
 
 
     def draw_domande_section(c, page_width, page_height, data):
@@ -382,7 +382,7 @@ async def generate_pdf(body: PdfRequest):
             # Disegna la domanda in bold
             c.setFont("Montserrat-Bold", 29.2)
             c.drawString(100, y_pos, f"- {domanda}")
-            y_pos -= 32
+            y_pos -= 36
 
     def draw_competitor_section(c, page_width, page_height, data):
         sito_web = data.get("sito_web", "il nostro sito")
@@ -392,7 +392,7 @@ async def generate_pdf(body: PdfRequest):
         # Titolo sezione Competitor diretti
         c.setFont("Montserrat-Bold", 29.2)
         c.drawString(100, y_pos, "Competitor diretti:")
-        y_pos -= 32
+        y_pos -= 36
 
         c.setFont("Montserrat-Regular", 29.2)
         text_lines = simpleSplit(
@@ -402,13 +402,13 @@ async def generate_pdf(body: PdfRequest):
         for line in text_lines:
             y_pos = check_and_new_page(c, y_pos, subtitle="POSSIBILI DIFFICOLTÀ")
             c.drawString(120, y_pos, line)
-            y_pos -= 22
+            y_pos -= 36
 
         # Titolo sezione Competitor indiretti
         y_pos -= 60
         c.setFont("Montserrat-Bold", 29.2)
         c.drawString(100, y_pos, "Competitor indiretti:")
-        y_pos -= 32
+        y_pos -= 36
 
         c.setFont("Montserrat-Regular", 29.2)
         text_lines = simpleSplit(
@@ -418,7 +418,7 @@ async def generate_pdf(body: PdfRequest):
         for line in text_lines:
             y_pos = check_and_new_page(c, y_pos, subtitle="POSSIBILI DIFFICOLTÀ")
             c.drawString(120, y_pos, line)
-            y_pos -= 22
+            y_pos -= 36
 
     def draw_bisogni_derivati_section(c, page_width, page_height, data):
         bisogni_derivati_raw = data.get("bisogni_derivati", "")
@@ -447,7 +447,7 @@ async def generate_pdf(body: PdfRequest):
 
             c.setFont("Montserrat-Bold", 29.2)
             c.drawString(100, y_pos, f"- {bisogno}")
-            y_pos -= 32
+            y_pos -= 36
 
             if spiegazione:
                 c.setFont("Montserrat-Regular", 29.2)
@@ -455,9 +455,9 @@ async def generate_pdf(body: PdfRequest):
                 for line in text_lines:
                     y_pos = check_and_new_page(c, y_pos, subtitle="BISOGNI DERIVATI")
                     c.drawString(120, y_pos, line)
-                    y_pos -= 26
+                    y_pos -= 36
 
-            y_pos -= 20
+            y_pos -= 30
             count += 1
 
 
@@ -487,7 +487,7 @@ async def generate_pdf(body: PdfRequest):
             c.setFont("Montserrat-Bold", 29.2)
             text_item = f"- {item}"
             c.drawString(100, y_pos, text_item)
-            y_pos -= 26
+            y_pos -= 36
 
             if explanation:
                 c.setFont("Montserrat-Regular", 29.2)
@@ -495,7 +495,7 @@ async def generate_pdf(body: PdfRequest):
                 for line in text_lines:
                     y_pos = check_and_new_page(c, y_pos)
                     c.drawString(120, y_pos, line)
-                    y_pos -= 22
+                    y_pos -= 36
 
             y_pos -= 20
 
