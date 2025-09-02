@@ -87,38 +87,27 @@ async def generate_pdf(body: PdfRequest):
     def draw_page_header(c):
         # Titolo principale
         c.setFont("Montserrat-ExtraBold", 80)
-        c.setFillColor(white)
         c.drawString(100, 675, "ANALISI DI MERCATO")
 
-        # Sottotitolo
-        c.setFont("Montserrat-Regular", 26)
-        c.drawString(100, 626, "DATI RACCOLTI")
+
 
 
  
 
     
-    def draw_page_layout(c, title, subtitle, paragraph):
+    def draw_page_layout(c, subtitle):
         # Titolo principale
         c.setFont("Montserrat-ExtraBold", 80)
-        # grandezza proporzionata
         c.setFillColor(white)
         c.drawString(100, 675, "ANALISI DI MERCATO")
 
-        # Sottotitolo
+        # Sottotitolo dinamico
         c.setFont("Montserrat-Regular", 26)
         c.drawString(100, 626, subtitle.upper())
 
-        # Paragrafo
-        c.setFont("Montserrat-Regular", 29.2)
-        text_lines = simpleSplit(paragraph, "Montserrat-Regular", 29.2, 825)
-        current_y = 338
-        for line in text_lines:
-            current_y = check_and_new_page(c, current_y)
-            c.drawString(100, current_y, line)
-            current_y -= 22
 
-        return current_y
+      
+
     
     def draw_vertical_gradient(c, width, height, top_color, mid_color, bottom_color, steps=200):
         """
@@ -274,8 +263,26 @@ async def generate_pdf(body: PdfRequest):
     spieg_bisogni_list = spieg_bisogni_raw.split("|") if spieg_bisogni_raw else []
 
     # Crea nuova pagina con titolo e bisogni
-    draw_section_page(c, "Bisogni Primari (secondo la Teoria di Robbins):", bisogni_list, spieg_bisogni_list)
-        
+    draw_page_layout(c, "BISOGNI PRIMARI (SECONDO LA TEORIA DI ROBBINS)")
+    y_pos = page_height - 300
+
+    # Contenuti (bisogni + spiegazioni)
+    for idx, bisogno in enumerate(bisogni_list):
+        bisogno = bisogno.strip()
+        spiegazione = spieg_bisogni_list[idx].strip() if idx < len(spieg_bisogni_list) else ""
+
+        c.setFont("Montserrat-Bold", 29.2)
+        c.drawString(100, y_pos, f"- {bisogno}")
+        y_pos -= 32
+
+        if spiegazione:
+            c.setFont("Montserrat-Regular", 29.2)
+            text_lines = simpleSplit(spiegazione, "Montserrat-Regular", 29.2, page_width - 200)
+            for line in text_lines:
+                y_pos = check_and_new_page(c, y_pos)
+                c.drawString(120, y_pos, line)
+                y_pos -= 26
+
     # Recupera i dati demografici
     target = body.data.get("target_demografico", {})
     demographics_labels = ["Età", "Genere", "Professione", "Interessi", "Stile di vita"]
@@ -288,8 +295,13 @@ async def generate_pdf(body: PdfRequest):
     ]
 
     # Crea nuova pagina con titolo e dati demografici
-    draw_section_page(c, "Dati demografici:", demographics_labels, demographics_values)
+    draw_page_layout(c, "DATI DEMOGRAFICI")
+    y_pos = page_height - 300
 
+    for label, value in zip(demographics_labels, demographics_values):
+        c.setFont("Montserrat-Bold", 29.2)
+        c.drawString(100, y_pos, f"- {label}: {value}")
+        y_pos -= 32
         # Recupera le obiezioni
     obiezioni_data = body.data.get("obiezioni", {})
     obiezioni_labels = ["Necessità di risolvere il problema", "Possibilità di trovare una soluzione", "Tipo di soluzione proposta", "Possibilità di raggiungere i risultati", "Credibilità azienda"]
@@ -301,15 +313,35 @@ async def generate_pdf(body: PdfRequest):
         obiezioni_data.get("credibilita_azienda", ""),
     ]
 
-    # Crea nuova pagina con titolo POSSIBILI DIFFICOLTÀ e obiezioni
-    draw_section_page(c, "Obiezioni:", obiezioni_labels, obiezioni_values)
+    # Crea nuova pagina con titolo OBIEZIONI
+    draw_page_layout(c, "OBIEZIONI")
+    y_pos = page_height - 300
+
+    for label, value in zip(obiezioni_labels, obiezioni_values):
+        c.setFont("Montserrat-Bold", 29.2)
+        c.drawString(100, y_pos, f"- {label}")
+        y_pos -= 32
+
+        if value:
+            c.setFont("Montserrat-Regular", 29.2)
+            text_lines = simpleSplit(value, "Montserrat-Regular", 29.2, page_width - 200)
+            for line in text_lines:
+                y_pos = check_and_new_page(c, y_pos)
+                c.drawString(120, y_pos, line)
+                y_pos -= 26
 
     # Recupera le domande tecniche
     domande_raw = body.data.get("domande_tecniche", "")
     domande_list = domande_raw.split("|") if domande_raw else []
 
     # Crea nuova pagina con titolo e domande tecniche
-    draw_section_page(c, "Domande tecniche:", domande_list, [])
+    draw_page_layout(c, "Domande Tecniche")
+    y_pos = page_height - 300
+
+    for domanda in domande_list:
+        c.setFont("Montserrat-Bold", 29.2)
+        c.drawString(100, y_pos, f"- {domanda.strip()}")
+        y_pos -= 32
 
     # Recupera il sito web
     sito_web = body.data.get("sito_web", "il nostro sito")
@@ -360,7 +392,24 @@ async def generate_pdf(body: PdfRequest):
     spieg_bisogni_derivati_list = spieg_bisogni_derivati_raw.split("|") if spieg_bisogni_derivati_raw else []
 
     # Crea nuova pagina con titolo e bisogni derivati
-    draw_section_page(c, "Bisogni Derivati:", bisogni_derivati_list, spieg_bisogni_derivati_list)
+    draw_page_layout(c, "Bisogni Derivati")
+    y_pos = page_height - 300
+
+    for idx, bisogno in enumerate(bisogni_derivati_list):
+        bisogno = bisogno.strip()
+        spiegazione = spieg_bisogni_derivati_list[idx].strip() if idx < len(spieg_bisogni_derivati_list) else ""
+
+        c.setFont("Montserrat-Bold", 29.2)
+        c.drawString(100, y_pos, f"- {bisogno}")
+        y_pos -= 32
+
+        if spiegazione:
+            c.setFont("Montserrat-Regular", 29.2)
+            text_lines = simpleSplit(spiegazione, "Montserrat-Regular", 29.2, page_width - 200)
+            for line in text_lines:
+                y_pos = check_and_new_page(c, y_pos)
+                c.drawString(120, y_pos, line)
+                y_pos -= 26
 
     # Salva ogni blocco in un buffer separato
     benefici_buffer = io.BytesIO()
