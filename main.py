@@ -88,15 +88,15 @@ async def generate_pdf(body: PdfRequest):
         # Titolo principale
         c.setFont("Montserrat-ExtraBold", 80)
         c.setFillColor(white)
-        c.drawString(493, 675, "ANALISI DI MERCATO")
+        c.drawString(348, 675, "ANALISI DI MERCATO")
 
         # Sottotitolo
         c.setFont("Montserrat-Regular", 26)
-        c.drawString(253, 626, "DATI RACCOLTI")
+        c.drawString(348, 626, "DATI RACCOLTI")
 
 
         # Paragrafo fisso
-        c.setFont("Montserrat-Bold", 29)
+        c.setFont("Montserrat-Bold", 29.2)
         c.drawString(348, 472, "Benefici dei prodotti:")
 
     
@@ -105,15 +105,15 @@ async def generate_pdf(body: PdfRequest):
         c.setFont("Montserrat-ExtraBold", 80)
         # grandezza proporzionata
         c.setFillColor(white)
-        c.drawString(493, 675, "ANALISI DI MERCATO")
+        c.drawString(348, 675, "ANALISI DI MERCATO")
 
         # Sottotitolo
         c.setFont("Montserrat-Regular", 26)
-        c.drawString(253, 626, subtitle.upper())
+        c.drawString(348, 626, subtitle.upper())
 
         # Paragrafo
-        c.setFont("Montserrat-Regular", 29)
-        text_lines = simpleSplit(paragraph, "Montserrat-Regular", 29, 825)
+        c.setFont("Montserrat-Regular", 29.2)
+        text_lines = simpleSplit(paragraph, "Montserrat-Regular", 29.2, 825)
         current_y = 338
         for line in text_lines:
             current_y = check_and_new_page(c, current_y)
@@ -195,7 +195,7 @@ async def generate_pdf(body: PdfRequest):
         draw_page_header(c)
 
         # Titolo sezione
-        c.setFont("Montserrat-Bold", 29)
+        c.setFont("Montserrat-Bold", 29.2)
         c.drawString(348, 472, section_title)
 
         # Punto di partenza sotto il titolo
@@ -323,11 +323,11 @@ async def generate_pdf(body: PdfRequest):
 
     # Header della pagina
     c.setFont("Montserrat-ExtraBold", 80)
-    c.drawString(493, 675, "ANALISI DI MERCATO")
+    c.drawString(348, 675, "ANALISI DI MERCATO")
 
 
     c.setFont("Montserrat-Regular", 26)
-    c.drawString(253, 626, "POSSIBILI DIFFICOLTÀ")
+    c.drawString(348, 626, "POSSIBILI DIFFICOLTÀ")
 
     c.setFont("Montserrat-Bold", 18)
     c.drawString(81, y_pos, "Competitor diretti:")
