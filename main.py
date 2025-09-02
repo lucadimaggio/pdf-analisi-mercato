@@ -206,6 +206,8 @@ async def generate_pdf(body: PdfRequest):
             draw_vertical_gradient(c, page_width, page_height, top, mid, bottom)
             c.setFillColor(white)
             draw_page_header(c)  # aggiunge titolo fisso
+
+            
             
             # Se è stato passato un sottotitolo, ridisegnalo
             if subtitle:
@@ -348,10 +350,11 @@ async def generate_pdf(body: PdfRequest):
             draw_page_header(c)
             c.setFont("Montserrat-Regular", 26)
             c.drawString(100, 626, "OBIEZIONI")
+            c.setFont("Montserrat-Bold", 29.2)
+
 
             y_pos = page_height - 300
 
-            c.setFont("Montserrat-Bold", 29.2)
             c.drawString(100, y_pos, f"- {label}")
             y_pos -= 36
 
@@ -440,10 +443,15 @@ async def generate_pdf(body: PdfRequest):
                 draw_vertical_gradient(c, page_width, page_height, HexColor("#000000"), HexColor("#001373"), HexColor("#000000"))
                 c.setFillColor(HexColor("#FFFFFF"))
                 draw_page_header(c)
+
+                # Reimposta sempre i font dopo showPage()
                 c.setFont("Montserrat-Regular", 26)
                 c.drawString(100, 626, "BISOGNI DERIVATI")
+                c.setFont("Montserrat-Bold", 29.2)
+
                 y_pos = page_height - 300
                 count = 0
+
 
             c.setFont("Montserrat-Bold", 29.2)
             c.drawString(100, y_pos, f"- {bisogno}")
