@@ -736,10 +736,10 @@ async def generate_pdf(body: PdfRequest):
         final_writer.write(final_buffer)
         final_buffer.seek(0)
 
-        nome_cliente = body.data.get("nome_cliente", "cliente")
+        sito_web = body.data.get("sito_web", "cliente")
 
         return StreamingResponse(final_buffer, media_type="application/pdf", headers={
-            "Content-Disposition": f"inline; filename=analisi_{nome_cliente}.pdf"
+            "Content-Disposition": f"inline; filename=analisi_{sito_web}.pdf"
 })
 
 
