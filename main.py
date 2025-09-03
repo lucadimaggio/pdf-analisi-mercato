@@ -415,11 +415,16 @@ async def generate_pdf(body: PdfRequest):
 
             if value:
                 c.setFont("Montserrat-Regular", 29.2)
-                text_lines = simpleSplit(value, "Montserrat-Regular", 29.2, page_width - 200)
-                for line in text_lines:
-                    y_pos = check_and_new_page(c, y_pos, subtitle="OBIEZIONI")
-                    c.drawString(120, y_pos, line)
-                    y_pos -= 36
+                sub_values = value.split("|")
+                for sub in sub_values:
+                    sub = sub.strip()
+                    if not sub:
+                        continue
+                    text_lines = simpleSplit(sub, "Montserrat-Regular", 29.2, page_width - 200)
+                    for line in text_lines:
+                        y_pos = check_and_new_page(c, y_pos, subtitle="OBIEZIONI")
+                        c.drawString(120, y_pos, line)
+                        y_pos -= 36
 
             y_pos -= 30
 
