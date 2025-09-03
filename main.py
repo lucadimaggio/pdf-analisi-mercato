@@ -474,7 +474,7 @@ async def generate_pdf(body: PdfRequest):
         c.setFont("Montserrat-Regular", 26)
         c.drawString(100, 626, "POSSIBILI DIFFICOLTÀ")
 
-        sito_web = data.get("sito_web", "il nostro sito")
+        sito_web = data.get("sito_web", "il nostro Brand")
 
         y_pos = page_height - 300
 
