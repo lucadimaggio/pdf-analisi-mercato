@@ -735,11 +735,15 @@ async def generate_pdf(body: PdfRequest):
         final_buffer = io.BytesIO()
         final_writer.write(final_buffer)
         final_buffer.seek(0)
+        
+        import re
 
         sito_web = body.data.get("sito_web", "cliente")
+        sito_web_safe = re.sub(r'[^a-zA-Z0-9_-]', '_', sito_web)
+
 
         return StreamingResponse(final_buffer, media_type="application/pdf", headers={
-            "Content-Disposition": f"inline; filename=analisi_{sito_web}.pdf"
+    "Content-Disposition": f"inline; filename=analisi_{sito_web_safe}.pdf"
 })
 
 
