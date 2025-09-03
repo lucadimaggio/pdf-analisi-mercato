@@ -304,6 +304,12 @@ async def generate_pdf(body: PdfRequest):
             count += 1
 
     def draw_demografici_section(c, page_width, page_height, data):
+        c.showPage()
+        draw_vertical_gradient(c, page_width, page_height, HexColor("#000000"), HexColor("#001373"), HexColor("#000000"))
+        c.setFillColor(HexColor("#FFFFFF"))
+        draw_page_header(c)
+        c.setFont("Montserrat-Regular", 26)
+        c.drawString(100, 626, "DATI DEMOGRAFICI")
         target = data.get("target_demografico", {})
         demographics_labels = ["Età", "Genere", "Professione", "Interessi", "Stile di vita"]
         demographics_values = [
@@ -370,6 +376,12 @@ async def generate_pdf(body: PdfRequest):
 
 
     def draw_domande_section(c, page_width, page_height, data):
+        c.showPage()
+        draw_vertical_gradient(c, page_width, page_height, HexColor("#000000"), HexColor("#001373"), HexColor("#000000"))
+        c.setFillColor(HexColor("#FFFFFF"))
+        draw_page_header(c)
+        c.setFont("Montserrat-Regular", 26)
+        c.drawString(100, 626, "DOMANDE TECNICHE")
         domande_raw = data.get("domande_tecniche", "")
         domande_list = domande_raw.split("|") if domande_raw else []
 
@@ -388,6 +400,13 @@ async def generate_pdf(body: PdfRequest):
             y_pos -= 36
 
     def draw_competitor_section(c, page_width, page_height, data):
+        c.showPage()
+        draw_vertical_gradient(c, page_width, page_height, HexColor("#000000"), HexColor("#001373"), HexColor("#000000"))
+        c.setFillColor(HexColor("#FFFFFF"))
+        draw_page_header(c)
+        c.setFont("Montserrat-Regular", 26)
+        c.drawString(100, 626, "POSSIBILI DIFFICOLTÀ")
+
         sito_web = data.get("sito_web", "il nostro sito")
 
         y_pos = page_height - 300
