@@ -309,6 +309,7 @@ async def generate_pdf(body: PdfRequest):
         draw_page_header(c)
         c.setFont("Montserrat-Regular", 26)
         c.drawString(100, 626, "DATI DEMOGRAFICI")
+
         target = data.get("target_demografico", {})
         demographics_labels = ["Età", "Genere", "Professione", "Interessi", "Stile di vita"]
         demographics_values = [
@@ -324,19 +325,24 @@ async def generate_pdf(body: PdfRequest):
         for label, value in zip(demographics_labels, demographics_values):
             y_pos = check_and_new_page(c, y_pos, subtitle="DATI DEMOGRAFICI")
 
-        # Disegna il label in bold
-        c.setFont("Montserrat-Bold", 29.2)
-        c.drawString(100, y_pos, f"- {label}:")
+            # Disegna il label in bold
+            c.setFont("Montserrat-Bold", 29.2)
+            c.drawString(100, y_pos, f"- {label}:")
 
-        # Disegna il valore in regular, subito dopo il label
-        label_width = c.stringWidth(f"- {label}:", "Montserrat-Bold", 29.2) + 10
-        c.setFont("Montserrat-Regular", 29.2)
-        text_lines = simpleSplit(value, "Montserrat-Regular", 29.2, page_width - 200 - label_width)
-        for line in text_lines:
-            c.drawString(100 + label_width, y_pos, line)
-            y_pos -= 36
+            # Calcola larghezza label
+            label_width = c.stringWidth(f"- {label}:", "Montserrat-Bold", 29.2) + 10
 
-           
+            # Disegna il valore in regular con wrapping
+            c.setFont("Montserrat-Regular", 29.2)
+            text_lines = simpleSplit(value, "Montserrat-Regular", 29.2, page_width - 150 - label_width)
+            for line in text_lines:
+                y_pos = check_and_new_page(c, y_pos, subtitle="DATI DEMOGRAFICI")
+                c.drawString(100 + label_width, y_pos, line)
+                y_pos -= 36
+
+            # Spazio tra una voce e l’altra
+            y_pos -= 20
+
 
     def draw_obiezioni_section(c, page_width, page_height, data):
         obiezioni_data = data.get("obiezioni", {})
@@ -352,7 +358,7 @@ async def generate_pdf(body: PdfRequest):
         obiezioni_values = [
             obiezioni_data.get("necessita", ""),
             obiezioni_data.get("possibilita", ""),
-            obiezioni_data.get("tipo", ""),
+            obiezioni_data.get("tipo_soluzione", ""),
             obiezioni_data.get("risultati", ""),
             obiezioni_data.get("credibilita_azienda", "")
         ]
