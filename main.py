@@ -311,36 +311,69 @@ async def generate_pdf(body: PdfRequest):
         c.drawString(100, 626, "DATI DEMOGRAFICI")
 
         target = data.get("target_demografico", {})
-        demographics_labels = ["Età", "Genere", "Professione", "Interessi", "Stile di vita"]
-        demographics_values = [
+
+        # 🔹 Divisione manuale in due gruppi
+        labels_page1 = ["Età", "Genere", "Professione"]
+        values_page1 = [
             target.get("eta", ""),
             target.get("genere", ""),
             target.get("professione", ""),
+        ]
+
+        labels_page2 = ["Interessi", "Stile di vita"]
+        values_page2 = [
             target.get("interessi", ""),
             target.get("stile_vita", ""),
         ]
 
+        # 🔹 Prima pagina (Età, Genere, Professione)
         y_pos = page_height - 300
-
-        for label, value in zip(demographics_labels, demographics_values):
+        for label, value in zip(labels_page1, values_page1):
             y_pos = check_and_new_page(c, y_pos, subtitle="DATI DEMOGRAFICI")
 
-            # Disegna il label in bold
+            # Label in bold (solo titolo, senza valore accanto)
             c.setFont("Montserrat-Bold", 29.2)
-            c.drawString(100, y_pos, f"- {label}:")
+            c.drawString(100, y_pos, f"- {label}")
+            y_pos -= 36
 
-            # Calcola larghezza label
-            label_width = c.stringWidth(f"- {label}:", "Montserrat-Bold", 29.2) + 10
 
-            # Disegna il valore in regular con wrapping
+            # Valore in regular sotto il label
             c.setFont("Montserrat-Regular", 29.2)
-            text_lines = simpleSplit(value, "Montserrat-Regular", 29.2, page_width - 150 - label_width)
+            text_lines = simpleSplit(value, "Montserrat-Regular", 29.2, page_width - 200)
             for line in text_lines:
                 y_pos = check_and_new_page(c, y_pos, subtitle="DATI DEMOGRAFICI")
-                c.drawString(100 + label_width, y_pos, line)
+                c.drawString(120, y_pos, line)
                 y_pos -= 36
 
-            # Spazio tra una voce e l’altra
+            y_pos -= 20
+
+        # 🔹 Seconda pagina (Interessi, Stile di vita)
+        c.showPage()
+        draw_vertical_gradient(c, page_width, page_height, HexColor("#000000"), HexColor("#001373"), HexColor("#000000"))
+        c.setFillColor(HexColor("#FFFFFF"))
+        draw_page_header(c)
+        c.setFont("Montserrat-Regular", 26)
+        c.drawString(100, 626, "DATI DEMOGRAFICI")
+
+        y_pos = page_height - 300
+        for label, value in zip(labels_page2, values_page2):
+            y_pos = check_and_new_page(c, y_pos, subtitle="DATI DEMOGRAFICI")
+
+            # Label in bold (solo titolo, senza valore accanto)
+            c.setFont("Montserrat-Bold", 29.2)
+            c.drawString(100, y_pos, f"- {label}")
+            y_pos -= 36
+
+
+            # Valore in regular sotto il label
+            c.setFont("Montserrat-Regular", 29.2)
+            text_lines = simpleSplit(value, "Montserrat-Regular", 29.2, page_width - 200)
+            for line in text_lines:
+                y_pos = check_and_new_page(c, y_pos, subtitle="DATI DEMOGRAFICI")
+                c.drawString(120, y_pos, line)
+                y_pos -= 36
+
+
             y_pos -= 20
 
 
