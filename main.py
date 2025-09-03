@@ -304,7 +304,6 @@ async def generate_pdf(body: PdfRequest):
             count += 1
 
     def draw_demografici_section(c, page_width, page_height, data):
-        c.showPage()
         draw_vertical_gradient(c, page_width, page_height, HexColor("#000000"), HexColor("#001373"), HexColor("#000000"))
         c.setFillColor(HexColor("#FFFFFF"))
         draw_page_header(c)
@@ -325,9 +324,19 @@ async def generate_pdf(body: PdfRequest):
         for label, value in zip(demographics_labels, demographics_values):
             y_pos = check_and_new_page(c, y_pos, subtitle="DATI DEMOGRAFICI")
 
-            c.setFont("Montserrat-Bold", 29.2)
-            c.drawString(100, y_pos, f"- {label}: {value}")
+        # Disegna il label in bold
+        c.setFont("Montserrat-Bold", 29.2)
+        c.drawString(100, y_pos, f"- {label}:")
+
+        # Disegna il valore in regular, subito dopo il label
+        label_width = c.stringWidth(f"- {label}:", "Montserrat-Bold", 29.2) + 10
+        c.setFont("Montserrat-Regular", 29.2)
+        text_lines = simpleSplit(value, "Montserrat-Regular", 29.2, page_width - 200 - label_width)
+        for line in text_lines:
+            c.drawString(100 + label_width, y_pos, line)
             y_pos -= 36
+
+           
 
     def draw_obiezioni_section(c, page_width, page_height, data):
         obiezioni_data = data.get("obiezioni", {})
@@ -348,15 +357,16 @@ async def generate_pdf(body: PdfRequest):
             obiezioni_data.get("credibilita_azienda", "")
         ]
 
-        for label, value in zip(obiezioni_labels, obiezioni_values):
-            # Forza sempre una nuova pagina
-            c.showPage()
+        for idx, (label, value) in enumerate(zip(obiezioni_labels, obiezioni_values)):
+            if idx > 0:  # Solo dalla seconda obiezione in poi
+                c.showPage()
             draw_vertical_gradient(c, page_width, page_height, HexColor("#000000"), HexColor("#001373"), HexColor("#000000"))
             c.setFillColor(HexColor("#FFFFFF"))
             draw_page_header(c)
             c.setFont("Montserrat-Regular", 26)
             c.drawString(100, 626, "OBIEZIONI")
             c.setFont("Montserrat-Bold", 29.2)
+
 
 
             y_pos = page_height - 300
