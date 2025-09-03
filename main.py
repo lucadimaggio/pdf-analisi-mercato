@@ -423,7 +423,6 @@ async def generate_pdf(body: PdfRequest):
 
             y_pos -= 30
 
-
     def draw_domande_section(c, page_width, page_height, data):
         c.showPage()
         draw_vertical_gradient(c, page_width, page_height, HexColor("#000000"), HexColor("#001373"), HexColor("#000000"))
@@ -431,22 +430,38 @@ async def generate_pdf(body: PdfRequest):
         draw_page_header(c)
         c.setFont("Montserrat-Regular", 26)
         c.drawString(100, 626, "DOMANDE TECNICHE")
+
         domande_raw = data.get("domande_tecniche", "")
         domande_list = domande_raw.split("|") if domande_raw else []
 
         y_pos = page_height - 300
+        count = 0
+        max_per_page = 3
 
         for domanda in domande_list:
             domanda = domanda.strip()
             if not domanda:
                 continue
 
+            # Se raggiungo 3 domande, vado a nuova pagina
+            if count >= max_per_page:
+                c.showPage()
+                draw_vertical_gradient(c, page_width, page_height, HexColor("#000000"), HexColor("#001373"), HexColor("#000000"))
+                c.setFillColor(HexColor("#FFFFFF"))
+                draw_page_header(c)
+                c.setFont("Montserrat-Regular", 26)
+                c.drawString(100, 626, "DOMANDE TECNICHE")
+                y_pos = page_height - 300
+                count = 0
+
             y_pos = check_and_new_page(c, y_pos, subtitle="DOMANDE TECNICHE")
 
-            # Disegna la domanda in bold
-            c.setFont("Montserrat-Bold", 29.2)
+            # Disegna la domanda in regular
+            c.setFont("Montserrat-Regular", 29.2)
             c.drawString(100, y_pos, f"- {domanda}")
             y_pos -= 36
+            count += 1
+
 
     def draw_competitor_section(c, page_width, page_height, data):
         c.showPage()
