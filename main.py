@@ -580,23 +580,6 @@ async def generate_pdf(body: PdfRequest):
     custom_reader = PdfReader(buffer)
 
     # Assegna i blocchi a buffer separati
-    def save_block(pages, out_buffer):
-        writer = PdfWriter()
-        for page in pages:
-            writer.add_page(page)
-        writer.write(out_buffer)
-        out_buffer.seek(0)
-
-    save_block(custom_reader.pages[2:3], demografici_buffer)       # demografici
-    save_block(custom_reader.pages[3:4], obiezioni_buffer)         # obiezioni
-    save_block(custom_reader.pages[4:5], domande_buffer)           # domande
-    save_block(custom_reader.pages[5:6], competitor_buffer)        # competitor
-    save_block(custom_reader.pages[6:], derivati_buffer)           # bisogni derivati
-    
-
-
-
-
 
     try:
         # === NUOVO BLOCCO: Unisci il template standard con le pagine custom ===
