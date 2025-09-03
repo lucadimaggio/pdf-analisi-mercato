@@ -472,7 +472,6 @@ async def generate_pdf(body: PdfRequest):
 
 
     def draw_competitor_section(c, page_width, page_height, data):
-        c.showPage()
         draw_vertical_gradient(c, page_width, page_height, HexColor("#000000"), HexColor("#001373"), HexColor("#000000"))
         c.setFillColor(HexColor("#FFFFFF"))
         draw_page_header(c)
