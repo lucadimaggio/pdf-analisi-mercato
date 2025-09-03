@@ -424,7 +424,6 @@ async def generate_pdf(body: PdfRequest):
             y_pos -= 30
 
     def draw_domande_section(c, page_width, page_height, data):
-        c.showPage()
         draw_vertical_gradient(c, page_width, page_height, HexColor("#000000"), HexColor("#001373"), HexColor("#000000"))
         c.setFillColor(HexColor("#FFFFFF"))
         draw_page_header(c)
@@ -458,8 +457,12 @@ async def generate_pdf(body: PdfRequest):
 
             # Disegna la domanda in regular
             c.setFont("Montserrat-Regular", 29.2)
-            c.drawString(100, y_pos, f"- {domanda}")
-            y_pos -= 36
+            text_lines = simpleSplit(f"- {domanda}", "Montserrat-Regular", 29.2, page_width - 200)
+            for line in text_lines:
+                y_pos = check_and_new_page(c, y_pos, subtitle="DOMANDE TECNICHE")
+                c.drawString(100, y_pos, line)
+                y_pos -= 36
+
             count += 1
 
 
