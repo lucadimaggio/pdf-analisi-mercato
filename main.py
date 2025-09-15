@@ -702,30 +702,32 @@ async def generate_pdf(body: PdfRequest):
         final_writer = PdfWriter()
         logger.info(f"Template ha {len(template_reader.pages)} pagine totali")
 
-        # --- Inserisci prime 7 pagine standard (se esistono) ---
-        for i in range(min(7, len(template_reader.pages))):
+        # --- Inserisci prime 6 pagine standard (se esistono) ---
+        for i in range(min(6, len(template_reader.pages))):
             final_writer.add_page(template_reader.pages[i])
 
-        # --- Inserisci blocchi custom dopo pagina 7 ---
+        # --- Inserisci blocchi custom dopo pagina 6 ---
         for page in benefici_reader.pages:
             final_writer.add_page(page)
-        for page in bisogni_reader.pages:
-            final_writer.add_page(page)
         for page in demo_reader.pages:
+            final_writer.add_page(page)
+        for page in bisogni_reader.pages:
             final_writer.add_page(page)
         for page in derivati_reader.pages:
             final_writer.add_page(page)
 
-        # --- Inserisci pagine 8 → 47 dal template ---
-        for i in range(7, min(47, len(template_reader.pages))):
+        # --- Inserisci pagine 7 → 35 dal template ---
+        for i in range(7, min(35, len(template_reader.pages))):
             final_writer.add_page(template_reader.pages[i])
 
-        # --- Inserisci Obiezioni dopo pagina 47 ---
+        # --- Inserisci blocchi custom dopo pagina 35 ---
         for page in obiezioni_reader.pages:
             final_writer.add_page(page)
+        for page in competitor_reader.pages:
+            final_writer.add_page(page)
 
-        # --- Inserisci eventuali pagine restanti dal template (dal 48 in poi) ---
-        for i in range(47, len(template_reader.pages)):
+        # --- Inserisci eventuali pagine restanti dal template (dal 36 in poi) ---
+        for i in range(36, len(template_reader.pages)):
             final_writer.add_page(template_reader.pages[i])
 
  
