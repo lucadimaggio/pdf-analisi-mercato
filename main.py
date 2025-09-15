@@ -702,7 +702,7 @@ async def generate_pdf(body: PdfRequest):
         final_writer = PdfWriter()
         logger.info(f"Template ha {len(template_reader.pages)} pagine totali")
 
-        # --- Inserisci prime 6 pagine standard (se esistono) ---
+        # --- Inserisci prime 6 pagine standard (0 → 5) ---
         for i in range(min(6, len(template_reader.pages))):
             final_writer.add_page(template_reader.pages[i])
 
@@ -716,8 +716,8 @@ async def generate_pdf(body: PdfRequest):
         for page in derivati_reader.pages:
             final_writer.add_page(page)
 
-        # --- Inserisci pagine 7 → 35 dal template ---
-        for i in range(7, min(35, len(template_reader.pages))):
+        # --- Inserisci pagine 6 → 34 dal template (cioè dalla settima alla 35esima inclusa) ---
+        for i in range(6, min(35, len(template_reader.pages))):
             final_writer.add_page(template_reader.pages[i])
 
         # --- Inserisci blocchi custom dopo pagina 35 ---
@@ -726,8 +726,8 @@ async def generate_pdf(body: PdfRequest):
         for page in competitor_reader.pages:
             final_writer.add_page(page)
 
-        # --- Inserisci eventuali pagine restanti dal template (dal 36 in poi) ---
-        for i in range(36, len(template_reader.pages)):
+        # --- Inserisci eventuali pagine restanti (dal 35 in poi) ---
+        for i in range(35, len(template_reader.pages)):
             final_writer.add_page(template_reader.pages[i])
 
  
