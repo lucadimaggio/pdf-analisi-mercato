@@ -730,7 +730,7 @@ async def generate_pdf(body: PdfRequest):
         for i in range(35, len(template_reader.pages)):
             final_writer.add_page(template_reader.pages[i])
 
- 
+
 
         # Salva il risultato in un nuovo buffer
         final_buffer = io.BytesIO()
